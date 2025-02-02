@@ -106,10 +106,7 @@ const HomeScreen = ({navigation}) => {
 
     return (
       <View
-        style={[
-          styles.dayContainer,
-          isWeekend && !isCurrentDay && styles.weekendDayContainer,
-        ]}
+        style={[styles.dayContainer, isWeekend && styles.weekendDayContainer]}
         key={date.toISOString()}>
         <Text style={[styles.dayHeader, isCurrentDay && styles.todayHeader]}>
           {format(date, 'EEEE, d MMMM', {locale: tr})}
