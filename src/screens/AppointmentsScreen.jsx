@@ -10,6 +10,8 @@ import {
 import {format} from 'date-fns';
 import {tr} from 'date-fns/locale';
 import {getAllAppointments, deleteAppointment} from '../service/database';
+import {Calendar, Edit2, Trash} from 'iconsax-react-native';
+import {calculateTimeLeft} from '../utils/function';
 
 const AppointmentsScreen = ({navigation}) => {
   const [appointments, setAppointments] = useState([]);
@@ -64,6 +66,53 @@ const AppointmentsScreen = ({navigation}) => {
           <TouchableOpacity
             style={[styles.button, styles.editButton]}
             onPress={() =>
+              navigation.navigate('AddAppointmentScreen', {appointment: item})
+            }>
+            <Edit2 size={20} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.button, styles.deleteButton]}
+            onPress={() => handleDelete(item.id)}>
+            <Trash size={20} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <View style={styles.appointmentDetails}>
+        <View style={styles.dateContainer}>
+          <Calendar size={18} color="#888" />
+
+          <Text style={styles.appointmentDate}>
+            {format(new Date(item.date), 'PPP - HH:mm', {locale: tr})}
+          </Text>
+        </View>
+
+        {item.description && (
+          <Text style={styles.appointmentDescription}>{item.description}</Text>
+        )}
+
+        <Text style={styles.contactName}>Kişi: {item.contact_name}</Text>
+      </View>
+
+      {/* Zaman Kapanışı */}
+      <View
+        style={[
+          styles.countdownContainer,
+          {backgroundColor: calculateTimeLeft(item.date).containerColor},
+        ]}>
+        <Text style={styles.countdownText}>
+          {calculateTimeLeft(item.date).timeLeft}
+        </Text>
+      </View>
+    </View>
+
+    /* <View style={styles.appointmentItem}>
+      <View style={styles.appointmentHeader}>
+        <Text style={styles.appointmentTitle}>{item.title}</Text>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={[styles.button, styles.editButton]}
+            onPress={() =>
               navigation.navigate('AddAppointmentScreen', {
                 appointment: item,
               })
@@ -84,7 +133,7 @@ const AppointmentsScreen = ({navigation}) => {
         <Text style={styles.appointmentDescription}>{item.description}</Text>
       )}
       <Text style={styles.contactName}>Kişi: {item.contact_name}</Text>
-    </View>
+    </View> */
   );
 
   return (
@@ -112,6 +161,7 @@ const styles = StyleSheet.create({
   listContainer: {
     padding: 16,
   },
+  /*
   appointmentItem: {
     backgroundColor: '#f8f9fa',
     borderRadius: 8,
@@ -149,7 +199,84 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#2196F3',
     fontWeight: '500',
+  }, */
+
+  appointmentItem: {
+    backgroundColor: '#f0f4f7',
+    borderRadius: 15,
+    marginBottom: 20,
+    padding: 20,
+    shadowColor: '#ccc',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 6,
   },
+  appointmentHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  appointmentTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  button: {
+    padding: 8,
+    borderRadius: 50,
+    marginLeft: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  editButton: {
+    backgroundColor: '#4CAF50', // Green
+  },
+  deleteButton: {
+    backgroundColor: '#F44336', // Red
+  },
+  appointmentDetails: {
+    marginTop: 15,
+  },
+  dateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  appointmentDate: {
+    fontSize: 14,
+    color: '#666',
+    marginLeft: 5,
+  },
+  appointmentDescription: {
+    fontSize: 15,
+    color: '#444',
+    marginTop: 8,
+  },
+  contactName: {
+    marginTop: 10,
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#333',
+  },
+  countdownContainer: {
+    marginTop: 15,
+    paddingVertical: 8,
+    backgroundColor: '#ffeb3b',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  countdownText: {
+    fontSize: 16,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+
   buttonContainer: {
     flexDirection: 'row',
     marginLeft: 8,
