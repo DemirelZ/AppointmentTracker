@@ -11,32 +11,74 @@ const db = SQLite.openDatabase(
   },
 );
 
-// Tabloları oluşturma
-export const createTables = () => {
-  // Kişiler tablosu
-  db.transaction(tx => {
-    tx.executeSql(
-      `CREATE TABLE IF NOT EXISTS contacts (
+// ESKİ Tabloları oluşturma
+// export const createTables = () => {
+//   // Kişiler tablosu
+//   db.transaction(tx => {
+//     tx.executeSql(
+//       `CREATE TABLE IF NOT EXISTS contacts (
+//                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+//                 name TEXT NOT NULL,
+//                 phone TEXT,
+//                 email TEXT,
+//                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+//             )`,
+//       [],
+//       () => {
+//         console.log('Contacts table created successfully');
+//       },
+//       (_, error) => {
+//         console.log('Error creating contacts table:', error);
+//       },
+//     );
+//   });
+
+//   // Randevular tablosu
+//   db.transaction(tx => {
+//     tx.executeSql(
+//       `CREATE TABLE IF NOT EXISTS appointments (
+//                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+//                 contact_id INTEGER,
+//                 title TEXT NOT NULL,
+//                 description TEXT,
+//                 date DATETIME NOT NULL,
+//                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+//                 FOREIGN KEY (contact_id) REFERENCES contacts (id)
+//             )`,
+//       [],
+//       () => {
+//         console.log('Appointments table created successfully');
+//       },
+//       (_, error) => {
+//         console.log('Error creating appointments table:', error);
+//       },
+//     );
+//   });
+// };
+
+export const initTables = () => {
+  return new Promise((resolve, reject) => {
+    db.transaction(tx => {
+      tx.executeSql(
+        `CREATE TABLE IF NOT EXISTS contacts (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
                 phone TEXT,
                 email TEXT,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )`,
-      [],
-      () => {
-        console.log('Contacts table created successfully');
-      },
-      (_, error) => {
-        console.log('Error creating contacts table:', error);
-      },
-    );
-  });
+        [],
+        () => {
+          console.log('✅ Contacts table created successfully');
+        },
+        (_, error) => {
+          console.error('❌ Error creating contacts table:', error);
+          reject(error);
+        },
+      );
 
-  // Randevular tablosu
-  db.transaction(tx => {
-    tx.executeSql(
-      `CREATE TABLE IF NOT EXISTS appointments (
+      tx.executeSql(
+        `CREATE TABLE IF NOT EXISTS appointments (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 contact_id INTEGER,
                 title TEXT NOT NULL,
@@ -45,14 +87,17 @@ export const createTables = () => {
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (contact_id) REFERENCES contacts (id)
             )`,
-      [],
-      () => {
-        console.log('Appointments table created successfully');
-      },
-      (_, error) => {
-        console.log('Error creating appointments table:', error);
-      },
-    );
+        [],
+        () => {
+          console.log('✅ Appointments table created successfully');
+          resolve(true);
+        },
+        (_, error) => {
+          console.error('❌ Error creating appointments table:', error);
+          reject(error);
+        },
+      );
+    });
   });
 };
 
@@ -204,29 +249,66 @@ export const getAllAppointments = () => {
 };
 
 // Belirli bir tarih aralığındaki randevuları getirme
-export const getAppointmentsByDateRange = (startDate, endDate) => {
+// export const getAppointmentsByDateRange = (startDate, endDate) => {
+//   return new Promise((resolve, reject) => {
+//     // Başlangıç tarihinin başlangıcı (00:00:00)
+//     const start = new Date(startDate);
+//     start.setHours(0, 0, 0, 0);
+
+//     // Bitiş tarihinin sonu (23:59:59)
+//     const end = new Date(endDate);
+//     end.setHours(23, 59, 59, 999);
+
+//     db.transaction(tx => {
+//       tx.executeSql(
+//         `SELECT appointments.*, contacts.name as contact_name
+//                  FROM appointments
+//                  LEFT JOIN contacts ON appointments.contact_id = contacts.id
+//                  WHERE date >= ? AND date <= ?
+//                  ORDER BY date ASC, appointments.created_at DESC`,
+//         [start.toISOString(), end.toISOString()],
+//         (_, result) => {
+//           resolve(result.rows.raw());
+//         },
+//         (_, error) => {
+//           reject(error);
+//         },
+//       );
+//     });
+//   });
+// };
+
+// Belirli bir tarih aralığındaki randevuları getirme
+export const getAppointmentsByDateRange = async (startDate, endDate) => {
   return new Promise((resolve, reject) => {
-    // Başlangıç tarihinin başlangıcı (00:00:00)
     const start = new Date(startDate);
     start.setHours(0, 0, 0, 0);
-
-    // Bitiş tarihinin sonu (23:59:59)
     const end = new Date(endDate);
     end.setHours(23, 59, 59, 999);
+
+    console.log(
+      '📅 SQL Query Tarih Aralığı:',
+      start.toISOString(),
+      end.toISOString(),
+    );
 
     db.transaction(tx => {
       tx.executeSql(
         `SELECT appointments.*, contacts.name as contact_name 
-                 FROM appointments 
-                 LEFT JOIN contacts ON appointments.contact_id = contacts.id 
-                 WHERE date >= ? AND date <= ?
-                 ORDER BY date ASC, appointments.created_at DESC`,
+         FROM appointments 
+         LEFT JOIN contacts ON appointments.contact_id = contacts.id 
+         WHERE date >= ? AND date <= ?
+         ORDER BY date ASC, appointments.created_at DESC`,
         [start.toISOString(), end.toISOString()],
         (_, result) => {
+          console.log('✅ SQL Sorgu Başarılı:', result.rows.raw());
           resolve(result.rows.raw());
         },
         (_, error) => {
-          reject(error);
+          console.error('❌ SQL Hatası:', error);
+          reject(
+            new Error('SQL sorgusu başarısız oldu: ' + JSON.stringify(error)),
+          );
         },
       );
     });
@@ -255,6 +337,31 @@ export const getTodayAppointmentsCount = () => {
     });
   });
 };
+
+// Bu haftanın randevu sayısını getirme
+// export const getWeekAppointmentsCount = () => {
+//   return new Promise((resolve, reject) => {
+//     const today = new Date();
+//     today.setHours(0, 0, 0, 0);
+//     const weekStart = new Date(today);
+//     weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+//     const weekEnd = new Date(weekStart);
+//     weekEnd.setDate(weekEnd.getDate() + 7);
+
+//     db.transaction(tx => {
+//       tx.executeSql(
+//         'SELECT COUNT(*) as count FROM appointments WHERE date >= ? AND date < ?',
+//         [weekStart.toISOString(), weekEnd.toISOString()],
+//         (_, result) => {
+//           resolve(result.rows.raw()[0].count);
+//         },
+//         (_, error) => {
+//           reject(error);
+//         },
+//       );
+//     });
+//   });
+// };
 
 // Bu haftanın randevu sayısını getirme
 export const getWeekAppointmentsCount = () => {

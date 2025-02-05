@@ -11,7 +11,6 @@ import {format} from 'date-fns';
 import {tr} from 'date-fns/locale';
 import {getAllAppointments, deleteAppointment} from '../service/database';
 import {Calendar, Edit2, Trash} from 'iconsax-react-native';
-import {calculateTimeLeft} from '../utils/function';
 
 const AppointmentsScreen = ({navigation}) => {
   const [appointments, setAppointments] = useState([]);
@@ -77,7 +76,6 @@ const AppointmentsScreen = ({navigation}) => {
           </TouchableOpacity>
         </View>
       </View>
-
       <View style={styles.appointmentDetails}>
         <View style={styles.dateContainer}>
           <Calendar size={18} color="#888" />
@@ -94,16 +92,18 @@ const AppointmentsScreen = ({navigation}) => {
         <Text style={styles.contactName}>Kişi: {item.contact_name}</Text>
       </View>
 
-      {/* Zaman Kapanışı */}
-      <View
+      {/* <View
         style={[
           styles.countdownContainer,
-          {backgroundColor: calculateTimeLeft(item.date).containerColor},
+          {
+            borderWidth: 2,
+            borderColor: calculateTimeLeft(item.date).containerColor,
+          },
         ]}>
         <Text style={styles.countdownText}>
           {calculateTimeLeft(item.date).timeLeft}
         </Text>
-      </View>
+      </View> */}
     </View>
 
     /* <View style={styles.appointmentItem}>
@@ -226,19 +226,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
   },
-  button: {
-    padding: 8,
-    borderRadius: 50,
-    marginLeft: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  editButton: {
-    backgroundColor: '#4CAF50', // Green
-  },
-  deleteButton: {
-    backgroundColor: '#F44336', // Red
-  },
+
   appointmentDetails: {
     marginTop: 15,
   },
@@ -266,7 +254,7 @@ const styles = StyleSheet.create({
   countdownContainer: {
     marginTop: 15,
     paddingVertical: 8,
-    backgroundColor: '#ffeb3b',
+    backgroundColor: '#f0f4f7',
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
@@ -306,12 +294,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 24,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
+    ...(Platform.OS === 'android'
+      ? {
+          elevation: 4, // Android için
+        }
+      : {}),
+    shadowColor: '#000', // iOS için
+    shadowOffset: {width: 0, height: 2}, // iOS için
+    shadowOpacity: 0.25, // iOS için
+    shadowRadius: 4, // iOS için
   },
+
   addButtonText: {
     color: '#fff',
     fontSize: 16,

@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {NavigationContainer} from '@react-navigation/native';
+import {NavigationContainer, useNavigation} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {Calendar, Profile, AddSquare} from 'iconsax-react-native';
@@ -12,17 +12,28 @@ import ContactListScreen from './src/screens/ContactListScreen';
 import AddContactScreen from './src/screens/AddContactScreen';
 
 // Database
-import {createTables} from './src/service/database';
+import {initTables} from './src/service/database';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
+
+import {Button} from 'react-native';
+import PastAppointmentsScreen from './src/screens/PastAppointmentScreen';
 
 const AppointmentsStack = () => (
   <Stack.Navigator>
     <Stack.Screen
       name="AppointmentsList"
       component={AppointmentsScreen}
-      options={{title: 'Randevular'}}
+      options={({navigation}) => ({
+        title: 'Randevular',
+        headerRight: () => (
+          <Button
+            title="Geçmiş"
+            onPress={() => navigation.navigate('PastAppointmentsScreen')}
+          />
+        ),
+      })}
     />
     <Stack.Screen
       name="AddAppointmentScreen"
@@ -30,6 +41,11 @@ const AppointmentsStack = () => (
       options={({route}) => ({
         title: route.params?.appointment ? 'Randevu Düzenle' : 'Yeni Randevu',
       })}
+    />
+    <Stack.Screen
+      name="PastAppointmentsScreen"
+      component={PastAppointmentsScreen}
+      options={{title: 'Geçmiş Randevular'}}
     />
   </Stack.Navigator>
 );
@@ -53,7 +69,8 @@ const ContactsStack = () => (
 
 const App = () => {
   useEffect(() => {
-    createTables();
+    //createTables();
+    initTables();
   }, []);
 
   return (

@@ -11,7 +11,7 @@ export const calculateTimeLeft = appointmentDate => {
   // Eğer tarih geçmişse, "Zaman geçti" döndür
   if (currentTime > targetDate) {
     return {
-      timeLeft: 'Zaman geçti',
+      timeLeft: 'Geçmiş randevu',
       containerColor: '#FFCDD2', // Kırmızı (açık kırmızı tonunda)
     };
   }

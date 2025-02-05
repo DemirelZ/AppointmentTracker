@@ -417,6 +417,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     padding: 16,
+
     borderTopWidth: 1,
     borderTopColor: '#eee',
   },
