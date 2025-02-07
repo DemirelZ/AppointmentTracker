@@ -248,6 +248,50 @@ export const getAllAppointments = () => {
   });
 };
 
+// Gelecekteki randevuları getirme
+export const getUpcomingAppointments = () => {
+  return new Promise((resolve, reject) => {
+    db.transaction(tx => {
+      tx.executeSql(
+        `SELECT appointments.*, contacts.name as contact_name 
+         FROM appointments 
+         LEFT JOIN contacts ON appointments.contact_id = contacts.id 
+         WHERE datetime(appointments.date) >= datetime('now')
+         ORDER BY datetime(appointments.date) ASC`,
+        [],
+        (_, result) => {
+          resolve(result.rows.raw());
+        },
+        (_, error) => {
+          reject(error);
+        },
+      );
+    });
+  });
+};
+
+// Geçmiş randevuları getirme
+export const getPastAppointments = () => {
+  return new Promise((resolve, reject) => {
+    db.transaction(tx => {
+      tx.executeSql(
+        `SELECT appointments.*, contacts.name as contact_name 
+         FROM appointments 
+         LEFT JOIN contacts ON appointments.contact_id = contacts.id 
+         WHERE datetime(appointments.date) < datetime('now')
+         ORDER BY datetime(appointments.date) DESC`,
+        [],
+        (_, result) => {
+          resolve(result.rows.raw());
+        },
+        (_, error) => {
+          reject(error);
+        },
+      );
+    });
+  });
+};
+
 // Belirli bir tarih aralığındaki randevuları getirme
 // export const getAppointmentsByDateRange = (startDate, endDate) => {
 //   return new Promise((resolve, reject) => {

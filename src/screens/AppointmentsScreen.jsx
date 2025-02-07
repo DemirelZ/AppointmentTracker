@@ -6,19 +6,20 @@ import {
   FlatList,
   TouchableOpacity,
   Alert,
+  Platform,
 } from 'react-native';
 import {format} from 'date-fns';
 import {tr} from 'date-fns/locale';
-import {getAllAppointments, deleteAppointment} from '../service/database';
+import {deleteAppointment, getUpcomingAppointments} from '../service/database';
 import {Calendar, Edit2, Trash} from 'iconsax-react-native';
 
 const AppointmentsScreen = ({navigation}) => {
-  const [appointments, setAppointments] = useState([]);
+  const [upcomingAppointments, setUpcomingAppointments] = useState([]);
 
   const loadAppointments = useCallback(async () => {
     try {
-      const result = await getAllAppointments();
-      setAppointments(result);
+      const result = await getUpcomingAppointments();
+      setUpcomingAppointments(result);
     } catch (error) {
       Alert.alert('Hata', 'Randevular yüklenirken bir hata oluştu.');
     }
@@ -139,7 +140,7 @@ const AppointmentsScreen = ({navigation}) => {
   return (
     <View style={styles.container}>
       <FlatList
-        data={appointments}
+        data={upcomingAppointments}
         renderItem={renderItem}
         keyExtractor={item => item.id.toString()}
         contentContainerStyle={styles.listContainer}
@@ -263,11 +264,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#fff',
     fontWeight: 'bold',
-  },
-
-  buttonContainer: {
-    flexDirection: 'row',
-    marginLeft: 8,
   },
   button: {
     paddingHorizontal: 12,
