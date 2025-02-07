@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
   },
   statsContainer: {
     flexDirection: 'row',
-    padding: 16,
+    padding: 8,
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   statValue: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#2196F3',
   },

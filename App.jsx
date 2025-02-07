@@ -79,6 +79,10 @@ const App = () => {
         screenOptions={{
           tabBarActiveTintColor: '#2196F3',
           tabBarInactiveTintColor: '#999',
+          tabBarStyle: {
+            height: 70,
+            paddingTop: 10,
+          },
         }}>
         <Tab.Screen
           name="Home"
