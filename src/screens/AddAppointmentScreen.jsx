@@ -129,13 +129,26 @@ const AddAppointmentScreen = ({navigation, route}) => {
     });
   };
 
-  const getSelectedContactName = () => {
+  // const getSelectedContactName = () => {
+  //   if (selectedContact) {
+  //     const contact = contacts.find(c => c.id === selectedContact);
+  //     return contact?.name || selectedContactName;
+  //   }
+  //   return null;
+  // };
+
+  const getSelectedContactDetails = () => {
     if (selectedContact) {
       const contact = contacts.find(c => c.id === selectedContact);
-      return contact?.name || selectedContactName;
+      return {
+        name: contact?.name || selectedContactName,
+        phone: contact?.phone || 'Numara bulunamadı',
+      };
     }
-    return null;
+    return {name: null, phone: null};
   };
+
+  const selectedContactDetails = getSelectedContactDetails();
 
   const ContactSelectionModal = () => (
     <Modal
@@ -219,9 +232,16 @@ const AddAppointmentScreen = ({navigation, route}) => {
           <View style={styles.contactSelectionContainer}>
             {selectedContact ? (
               <View style={styles.selectedContactContainer}>
-                <Text style={styles.selectedContactText}>
-                  {getSelectedContactName()}
-                </Text>
+                <View>
+                  <Text style={styles.selectedContactText}>
+                    {selectedContactDetails.name}
+                  </Text>
+                  {selectedContactDetails.phone && (
+                    <Text style={styles.selectedContactPhoneText}>
+                      {selectedContactDetails.phone}
+                    </Text>
+                  )}
+                </View>
                 <TouchableOpacity
                   style={styles.changeContactButton}
                   onPress={() => setShowContactModal(true)}>
@@ -438,6 +458,11 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '500',
+  },
+  selectedContactPhoneText: {
+    fontSize: 14,
+    color: 'gray',
+    marginTop: 4, // İsmin altında biraz boşluk bırakır
   },
 });
 

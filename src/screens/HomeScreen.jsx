@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   dayContainer: {
-    padding: 16,
+    padding: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
   },

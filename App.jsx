@@ -1,5 +1,11 @@
-import React, {useEffect} from 'react';
-import {NavigationContainer, useNavigation} from '@react-navigation/native';
+import React, {useCallback, useEffect} from 'react';
+import {
+  CommonActions,
+  NavigationContainer,
+  StackActions,
+  useFocusEffect,
+  useNavigation,
+} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {Calendar, Profile, AddSquare} from 'iconsax-react-native';
@@ -10,6 +16,7 @@ import AppointmentsScreen from './src/screens/AppointmentsScreen';
 import AddAppointmentScreen from './src/screens/AddAppointmentScreen';
 import ContactListScreen from './src/screens/ContactListScreen';
 import AddContactScreen from './src/screens/AddContactScreen';
+import PastAppointmentsScreen from './src/screens/PastAppointmentScreen';
 
 // Database
 import {initTables} from './src/service/database';
@@ -18,7 +25,6 @@ const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
 import {Button} from 'react-native';
-import PastAppointmentsScreen from './src/screens/PastAppointmentScreen';
 
 const AppointmentsStack = () => (
   <Stack.Navigator>
@@ -98,6 +104,7 @@ const App = () => {
           options={{
             headerShown: false,
             tabBarIcon: ({color}) => <AddSquare size={24} color={color} />,
+            unmountOnBlur: true,
           }}
         />
         <Tab.Screen
@@ -106,6 +113,7 @@ const App = () => {
           options={{
             headerShown: false,
             tabBarIcon: ({color}) => <Profile size={24} color={color} />,
+            unmountOnBlur: true,
           }}
         />
       </Tab.Navigator>
