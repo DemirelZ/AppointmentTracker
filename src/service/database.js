@@ -292,6 +292,24 @@ export const getPastAppointments = () => {
   });
 };
 
+// Tüm Geçmiş randevuları silme
+export const deletePastAppointments = () => {
+  return new Promise((resolve, reject) => {
+    db.transaction(tx => {
+      tx.executeSql(
+        `DELETE FROM appointments WHERE datetime(date) < datetime('now')`,
+        [],
+        (_, result) => {
+          resolve(result);
+        },
+        (_, error) => {
+          reject(error);
+        },
+      );
+    });
+  });
+};
+
 // Belirli bir tarih aralığındaki randevuları getirme
 // export const getAppointmentsByDateRange = (startDate, endDate) => {
 //   return new Promise((resolve, reject) => {
@@ -359,17 +377,41 @@ export const getAppointmentsByDateRange = async (startDate, endDate) => {
   });
 };
 
-// Bugünün randevu sayısını getirme
+// // Bugünün randevu sayısını getirme
+// export const getTodayAppointmentsCount = () => {
+//   return new Promise((resolve, reject) => {
+//     const today = new Date();
+//     today.setHours(0, 0, 0, 0);
+//     const tomorrow = new Date(today);
+//     tomorrow.setDate(tomorrow.getDate() + 1);
+
+//     db.transaction(tx => {
+//       tx.executeSql(
+//         'SELECT COUNT(*) as count FROM appointments WHERE date >= ? AND date < ?',
+//         [today.toISOString(), tomorrow.toISOString()],
+//         (_, result) => {
+//           resolve(result.rows.raw()[0].count);
+//         },
+//         (_, error) => {
+//           reject(error);
+//         },
+//       );
+//     });
+//   });
+// };
+
 export const getTodayAppointmentsCount = () => {
   return new Promise((resolve, reject) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0); // Saatleri sıfırla
 
     db.transaction(tx => {
       tx.executeSql(
-        'SELECT COUNT(*) as count FROM appointments WHERE date >= ? AND date < ?',
+        'SELECT COUNT(*) as count FROM appointments WHERE datetime(date) >= datetime(?) AND datetime(date) < datetime(?)',
         [today.toISOString(), tomorrow.toISOString()],
         (_, result) => {
           resolve(result.rows.raw()[0].count);
@@ -407,19 +449,51 @@ export const getTodayAppointmentsCount = () => {
 //   });
 // };
 
-// Bu haftanın randevu sayısını getirme
+// // Bu haftanın randevu sayısını getirme
+// export const getWeekAppointmentsCount = () => {
+//   return new Promise((resolve, reject) => {
+//     const today = new Date();
+//     today.setHours(0, 0, 0, 0);
+//     const weekStart = new Date(today);
+//     weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+//     const weekEnd = new Date(weekStart);
+//     weekEnd.setDate(weekEnd.getDate() + 7);
+
+//     db.transaction(tx => {
+//       tx.executeSql(
+//         'SELECT COUNT(*) as count FROM appointments WHERE date >= ? AND date < ?',
+//         [weekStart.toISOString(), weekEnd.toISOString()],
+//         (_, result) => {
+//           resolve(result.rows.raw()[0].count);
+//         },
+//         (_, error) => {
+//           reject(error);
+//         },
+//       );
+//     });
+//   });
+// };
+
 export const getWeekAppointmentsCount = () => {
   return new Promise((resolve, reject) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+
+    // Haftanın başlangıcı (Pazartesi günü olacak şekilde hesaplanıyor)
     const weekStart = new Date(today);
-    weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+    weekStart.setDate(
+      weekStart.getDate() -
+        (weekStart.getDay() === 0 ? 6 : weekStart.getDay() - 1),
+    );
+
+    // Haftanın son günü (Pazar günü, 23:59:59.999)
     const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekEnd.getDate() + 7);
+    weekEnd.setDate(weekStart.getDate() + 6);
+    weekEnd.setHours(23, 59, 59, 999);
 
     db.transaction(tx => {
       tx.executeSql(
-        'SELECT COUNT(*) as count FROM appointments WHERE date >= ? AND date < ?',
+        'SELECT COUNT(*) as count FROM appointments WHERE datetime(date) >= datetime(?) AND datetime(date) <= datetime(?)',
         [weekStart.toISOString(), weekEnd.toISOString()],
         (_, result) => {
           resolve(result.rows.raw()[0].count);
@@ -432,17 +506,44 @@ export const getWeekAppointmentsCount = () => {
   });
 };
 
-// Bu ayın randevu sayısını getirme
+// // Bu ayın randevu sayısını getirme
+// export const getMonthAppointmentsCount = () => {
+//   return new Promise((resolve, reject) => {
+//     const today = new Date();
+//     const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+//     const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+//     monthEnd.setHours(23, 59, 59, 999);
+
+//     db.transaction(tx => {
+//       tx.executeSql(
+//         'SELECT COUNT(*) as count FROM appointments WHERE date >= ? AND date <= ?',
+//         [monthStart.toISOString(), monthEnd.toISOString()],
+//         (_, result) => {
+//           resolve(result.rows.raw()[0].count);
+//         },
+//         (_, error) => {
+//           reject(error);
+//         },
+//       );
+//     });
+//   });
+// };
+
 export const getMonthAppointmentsCount = () => {
   return new Promise((resolve, reject) => {
     const today = new Date();
+
+    // Ayın başlangıcı (1. gün, 00:00:00)
     const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+    monthStart.setHours(0, 0, 0, 0);
+
+    // Ayın son günü (23:59:59.999)
     const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
     monthEnd.setHours(23, 59, 59, 999);
 
     db.transaction(tx => {
       tx.executeSql(
-        'SELECT COUNT(*) as count FROM appointments WHERE date >= ? AND date <= ?',
+        'SELECT COUNT(*) as count FROM appointments WHERE datetime(date) >= datetime(?) AND datetime(date) <= datetime(?)',
         [monthStart.toISOString(), monthEnd.toISOString()],
         (_, result) => {
           resolve(result.rows.raw()[0].count);

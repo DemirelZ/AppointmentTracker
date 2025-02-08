@@ -100,18 +100,21 @@ const DateTimePickerModal = ({
 
     return (
       <View style={styles.calendar}>
+        {/* Haftanın günleri */}
         <View style={styles.weekDays}>
           {['Pz', 'Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct'].map((day, index) => (
             <Text
               key={index}
               style={[
                 styles.weekDayText,
-                (index === 0 || index === 6) && styles.weekendDayHeaderText,
+                (index === 0 || index === 6) && styles.weekendDayHeaderText, // Hafta sonu günleri için özel stil
               ]}>
               {day}
             </Text>
           ))}
         </View>
+
+        {/* Günler */}
         <View style={styles.daysContainer}>{days}</View>
       </View>
     );
@@ -262,24 +265,56 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     flex: 1,
   },
+  // calendar: {
+  //   paddingHorizontal: 10,
+  // },
+  // weekDays: {
+  //   flexDirection: 'row',
+  //   marginBottom: 10,
+  // },
+  // weekDayText: {
+  //   flex: 1,
+  //   textAlign: 'center',
+  //   color: '#666',
+  //   fontSize: 12,
+  //   fontWeight: '500',
+  // },
+  // daysContainer: {
+  //   flexDirection: 'row',
+  //   flexWrap: 'wrap',
+  // },
+
   calendar: {
-    paddingHorizontal: 10,
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: '#fff', // Arka plan rengi
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 1},
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3, // Android için gölge
   },
   weekDays: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     marginBottom: 10,
   },
   weekDayText: {
-    flex: 1,
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#333',
     textAlign: 'center',
-    color: '#666',
-    fontSize: 12,
-    fontWeight: '500',
+    width: '14%', // Her bir gün için eşit genişlik
+  },
+  weekendDayHeaderText: {
+    color: '#D32F2F', // Hafta sonu günlerinin kırmızı olması
   },
   daysContainer: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexWrap: 'wrap', // Günleri taşır, böylece ekran küçük olsa bile sığdırır
+    justifyContent: 'space-between',
   },
+
   dayButton: {
     width: (SCREEN_WIDTH - 40) / 7,
     height: 40,
@@ -341,7 +376,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     paddingHorizontal: 20,
-    height: 300,
+    height: 500,
   },
   timeColumn: {
     flex: 1,

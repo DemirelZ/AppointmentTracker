@@ -189,7 +189,9 @@ const AddAppointmentScreen = ({navigation, route}) => {
           <View style={styles.modalButtonsContainer}>
             <TouchableOpacity
               style={[styles.modalButton, styles.cancelButton]}
-              onPress={() => setShowContactModal(false)}>
+              onPress={() => {
+                setShowContactModal(false), setSelectedContact(null);
+              }}>
               <Text style={styles.modalButtonText}>İptal</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -210,24 +212,6 @@ const AddAppointmentScreen = ({navigation, route}) => {
     <>
       <ScrollView style={styles.container}>
         <View style={styles.form}>
-          <Text style={styles.label}>Başlık</Text>
-          <TextInput
-            style={styles.input}
-            value={title}
-            onChangeText={setTitle}
-            placeholder="Randevu başlığı"
-          />
-
-          <Text style={styles.label}>Açıklama</Text>
-          <TextInput
-            style={[styles.input, styles.textArea]}
-            value={description}
-            onChangeText={setDescription}
-            placeholder="Randevu açıklaması"
-            multiline
-            numberOfLines={4}
-          />
-
           <Text style={styles.label}>Kişi</Text>
           <View style={styles.contactSelectionContainer}>
             {selectedContact ? (
@@ -256,6 +240,23 @@ const AddAppointmentScreen = ({navigation, route}) => {
               </TouchableOpacity>
             )}
           </View>
+          <Text style={styles.label}>Başlık</Text>
+          <TextInput
+            style={styles.input}
+            value={title}
+            onChangeText={setTitle}
+            placeholder="Randevu başlığı"
+          />
+
+          <Text style={styles.label}>Açıklama</Text>
+          <TextInput
+            style={[styles.input, styles.textArea]}
+            value={description}
+            onChangeText={setDescription}
+            placeholder="Randevu açıklaması"
+            multiline
+            numberOfLines={4}
+          />
 
           <Text style={styles.label}>Tarih</Text>
           <TouchableOpacity

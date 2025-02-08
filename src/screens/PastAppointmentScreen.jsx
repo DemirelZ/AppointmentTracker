@@ -11,8 +11,8 @@ import {
 import {format} from 'date-fns';
 import {tr} from 'date-fns/locale';
 import {
-  getAllAppointments,
   deleteAppointment,
+  deletePastAppointments,
   getPastAppointments,
 } from '../service/database';
 import {Calendar, Edit2, Trash} from 'iconsax-react-native';
@@ -55,6 +55,34 @@ const PastAppointmentsScreen = ({navigation}) => {
               loadAppointments();
             } catch (error) {
               Alert.alert('Hata', 'Randevu silinirken bir hata oluştu.');
+            }
+          },
+        },
+      ],
+    );
+  };
+
+  const handleAllAppointmentsDelete = () => {
+    Alert.alert(
+      'Tüm Geçmiş Randevuları Sil',
+      'Tüm geçmiş randevular kalıcı olarak silinecek.\n\nTüm geçmiş randevuları silmek istediğinizden emin misiniz?',
+      [
+        {
+          text: 'İptal',
+          style: 'cancel',
+        },
+        {
+          text: 'Sil',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deletePastAppointments();
+              loadAppointments(); // Listeyi güncelle
+            } catch (error) {
+              Alert.alert(
+                'Hata',
+                'Geçmiş randevular silinirken bir hata oluştu.',
+              );
             }
           },
         },
@@ -148,12 +176,22 @@ const PastAppointmentsScreen = ({navigation}) => {
         renderItem={renderItem}
         keyExtractor={item => item.id.toString()}
         contentContainerStyle={styles.listContainer}
+        ListEmptyComponent={
+          <Text style={{textAlign: 'center'}}>Liste boş</Text>
+        }
       />
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={() => navigation.navigate('AddAppointmentScreen')}>
-        <Text style={styles.addButtonText}>+ Yeni Randevu</Text>
-      </TouchableOpacity>
+      <View style={styles.buttonsContainer}>
+        <TouchableOpacity
+          style={styles.deleteAllButton}
+          onPress={handleAllAppointmentsDelete}>
+          <Text style={styles.addButtonText}>Tüm Geçmiş Randevuları Sil</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => navigation.navigate('AddAppointmentScreen')}>
+          <Text style={styles.addButtonText}>+ Yeni Randevu</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -271,6 +309,14 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
+  buttonsContainer: {
+    position: 'absolute',
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    bottom: 4,
+  },
   button: {
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -283,24 +329,33 @@ const styles = StyleSheet.create({
   deleteButton: {
     backgroundColor: '#f44336',
   },
+  deleteAllButton: {
+    backgroundColor: '#f44336',
+    marginVertical: 5,
+    marginHorizontal: 5,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 24,
+  },
   buttonText: {
     color: '#fff',
     fontSize: 12,
     fontWeight: '500',
   },
   addButton: {
-    position: 'absolute',
-    bottom: 24,
-    right: 24,
+    // position: 'absolute',
+    // bottom: 24,
+    // right: 24,
+    marginVertical: 5,
     backgroundColor: '#4CAF50',
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 24,
-    ...(Platform.OS === 'android'
-      ? {
-          elevation: 4, // Android için
-        }
-      : {}),
+    // ...(Platform.OS === 'android'
+    //   ? {
+    //       elevation: 4, // Android için
+    //     }
+    //   : {}),
     shadowColor: '#000', // iOS için
     shadowOffset: {width: 0, height: 2}, // iOS için
     shadowOpacity: 0.25, // iOS için
@@ -311,6 +366,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 

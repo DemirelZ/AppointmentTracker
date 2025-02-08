@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-import {format, addDays, startOfDay} from 'date-fns';
+import {format, addDays, startOfDay, subDays} from 'date-fns';
 import {tr} from 'date-fns/locale';
 import {
   getAppointmentsByDateRange,
@@ -15,10 +15,18 @@ import {
   getWeekAppointmentsCount,
   getMonthAppointmentsCount,
 } from '../service/database';
+import {ArrowLeft2, ArrowRight2} from 'iconsax-react-native';
 
 const HomeScreen = ({navigation}) => {
   const [weekAppointments, setWeekAppointments] = useState([]);
-  const [startDate, setStartDate] = useState(startOfDay(new Date()));
+  //const [startDate, setStartDate] = useState(startOfDay(new Date()));
+  const [startDate, setStartDate] = useState(() => {
+    const today = new Date();
+    const dayOfWeek = today.getDay(); // 0 (Pazar) - 6 (Cumartesi)
+    const monday = subDays(today, dayOfWeek === 0 ? 6 : dayOfWeek - 1); // Haftanın Pazartesi gününü bul
+    return startOfDay(monday);
+  });
+
   const [stats, setStats] = useState({
     today: 0,
     week: 0,
@@ -74,8 +82,18 @@ const HomeScreen = ({navigation}) => {
     );
   };
 
+  // const goToToday = () => {
+  //   setStartDate(startOfDay(new Date()));
+  // };
   const goToToday = () => {
-    setStartDate(startOfDay(new Date()));
+    const today = new Date();
+    const dayOfWeek = today.getDay(); // Bugünün haftanın günü (0 - Pazar, 1 - Pazartesi, ...)
+
+    // Pazartesi'yi haftanın başı olarak kabul et
+    const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Eğer Pazar ise 6 gün geriye git, aksi halde (1-6) Pazartesi'ye git
+    const monday = addDays(today, -daysToSubtract); // Pazartesi'yi bul
+
+    setStartDate(monday); // Haftanın Pazartesi'sini başlangıç tarihi olarak ayarla
   };
 
   const renderStats = () => (
@@ -165,20 +183,36 @@ const HomeScreen = ({navigation}) => {
     <View style={styles.container}>
       {renderStats()}
       <View style={styles.header}>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={() => setStartDate(addDays(startDate, -7))}
           style={styles.headerButton}>
           <Text style={styles.headerButtonText}>← Önceki Hafta</Text>
+        </TouchableOpacity> */}
+        <TouchableOpacity
+          onPress={() => setStartDate(addDays(startDate, -7))}
+          style={styles.headerButton}>
+          <View style={styles.prevWeek}>
+            <ArrowLeft2 size="22" color="#666" />
+            <Text style={styles.headerButtonText}>Önceki Hafta</Text>
+          </View>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={goToToday}
           style={[styles.headerButton, styles.todayButton]}>
-          <Text style={styles.todayButtonText}>Bugün</Text>
+          <Text style={styles.todayButtonText}>Bu Hafta</Text>
         </TouchableOpacity>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={() => setStartDate(addDays(startDate, 7))}
           style={styles.headerButton}>
           <Text style={styles.headerButtonText}>Sonraki Hafta →</Text>
+        </TouchableOpacity> */}
+        <TouchableOpacity
+          onPress={() => setStartDate(addDays(startDate, 7))}
+          style={styles.headerButton}>
+          <View style={styles.afterWeek}>
+            <Text style={styles.headerButtonText}>Sonraki Hafta</Text>
+            <ArrowRight2 size="22" color="#666" />
+          </View>
         </TouchableOpacity>
       </View>
       <ScrollView style={styles.weekContainer}>{renderWeek()}</ScrollView>
@@ -194,7 +228,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    padding: 16,
+    padding: 10,
     backgroundColor: '#f5f5f5',
   },
   headerButton: {
@@ -208,6 +242,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#2196F3',
     paddingHorizontal: 16,
     paddingVertical: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   todayButtonText: {
     color: '#fff',
@@ -234,7 +270,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   dayContainer: {
-    padding: 12,
+    padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
   },
@@ -319,6 +355,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#e3e3ff',
+  },
+  prevWeek: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  afterWeek: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });
 

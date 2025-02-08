@@ -8,7 +8,7 @@ import {
 } from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {Calendar, Profile, AddSquare} from 'iconsax-react-native';
+import {Calendar, Profile, AddSquare, Personalcard} from 'iconsax-react-native';
 
 // Screens
 import HomeScreen from './src/screens/HomeScreen';
@@ -86,7 +86,7 @@ const App = () => {
           tabBarActiveTintColor: '#2196F3',
           tabBarInactiveTintColor: '#999',
           tabBarStyle: {
-            height: 70,
+            height: 66,
             paddingTop: 10,
           },
         }}>
@@ -95,7 +95,13 @@ const App = () => {
           component={HomeScreen}
           options={{
             title: 'Takvim',
-            tabBarIcon: ({color}) => <Calendar size={24} color={color} />,
+            tabBarIcon: ({color, focused}) => (
+              <Calendar
+                size={focused ? 30 : 24}
+                color={color}
+                variant={focused ? 'Bold' : 'Outline'}
+              />
+            ),
           }}
         />
         <Tab.Screen
@@ -103,7 +109,13 @@ const App = () => {
           component={AppointmentsStack}
           options={{
             headerShown: false,
-            tabBarIcon: ({color}) => <AddSquare size={24} color={color} />,
+            tabBarIcon: ({color, focused}) => (
+              <AddSquare
+                size={focused ? 30 : 24}
+                color={color}
+                variant={focused ? 'Bold' : 'Outline'}
+              />
+            ),
             unmountOnBlur: true,
           }}
         />
@@ -112,7 +124,13 @@ const App = () => {
           component={ContactsStack}
           options={{
             headerShown: false,
-            tabBarIcon: ({color}) => <Profile size={24} color={color} />,
+            tabBarIcon: ({color, focused}) => (
+              <Personalcard
+                size={focused ? 30 : 24}
+                color={color}
+                variant={focused ? 'Bold' : 'Outline'}
+              />
+            ),
             unmountOnBlur: true,
           }}
         />

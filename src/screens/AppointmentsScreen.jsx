@@ -222,6 +222,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#333',
+    flex: 1,
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -290,15 +291,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 24,
-    ...(Platform.OS === 'android'
-      ? {
-          elevation: 4, // Android için
-        }
-      : {}),
+    borderWidth: 1,
+    borderColor: '#388E3C',
     shadowColor: '#000', // iOS için
     shadowOffset: {width: 0, height: 2}, // iOS için
-    shadowOpacity: 0.25, // iOS için
-    shadowRadius: 4, // iOS için
+    shadowOpacity: 0.5, // iOS için
+    shadowRadius: 6, // iOS için
   },
 
   addButtonText: {

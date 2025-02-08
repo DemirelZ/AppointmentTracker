@@ -83,6 +83,9 @@ const ContactListScreen = ({navigation}) => {
         renderItem={renderItem}
         keyExtractor={item => item.id.toString()}
         contentContainerStyle={styles.listContainer}
+        ListEmptyComponent={
+          <Text style={{textAlign: 'center'}}>Liste boş</Text>
+        }
       />
       <TouchableOpacity
         style={styles.addButton}
@@ -150,6 +153,59 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '500',
   },
+
+  // contactItem: {
+  //   flexDirection: 'row',
+  //   padding: 16,
+  //   marginBottom: 12,
+  //   borderRadius: 8,
+  //   backgroundColor: '#fff',
+  //   shadowColor: '#000',
+  //   shadowOffset: {width: 0, height: 2},
+  //   shadowOpacity: 0.1,
+  //   shadowRadius: 5,
+  //   elevation: 3, // Android için gölge
+  //   justifyContent: 'space-between',
+  // },
+  // contactInfo: {
+  //   flex: 1,
+  //   justifyContent: 'center',
+  // },
+  // contactName: {
+  //   fontSize: 18,
+  //   fontWeight: 'bold',
+  //   color: '#333',
+  // },
+  // contactDetail: {
+  //   fontSize: 14,
+  //   color: '#666',
+  //   marginTop: 4,
+  // },
+  // buttonContainer: {
+  //   flexDirection: 'row',
+  //   justifyContent: 'flex-end',
+  //   alignItems: 'center',
+  // },
+  // button: {
+  //   paddingHorizontal: 16,
+  //   paddingVertical: 8,
+  //   borderRadius: 20,
+  //   marginLeft: 8,
+  //   justifyContent: 'center',
+  //   alignItems: 'center',
+  // },
+  // editButton: {
+  //   backgroundColor: '#4CAF50',
+  // },
+  // deleteButton: {
+  //   backgroundColor: '#F44336',
+  // },
+  // buttonText: {
+  //   color: '#fff',
+  //   fontSize: 14,
+  //   fontWeight: '500',
+  // },
+
   addButton: {
     position: 'absolute',
     bottom: 24,
@@ -158,11 +214,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 24,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
+    borderWidth: 1,
+    borderColor: '#388E3C',
+    shadowColor: '#000', // iOS için
+    shadowOffset: {width: 0, height: 2}, // iOS için
+    shadowOpacity: 0.5, // iOS için
+    shadowRadius: 6, // iOS için
   },
   addButtonText: {
     color: '#fff',
