@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  Modal,
 } from 'react-native';
 import {format, addDays, startOfDay, subDays} from 'date-fns';
 import {tr} from 'date-fns/locale';
@@ -15,7 +16,7 @@ import {
   getWeekAppointmentsCount,
   getMonthAppointmentsCount,
 } from '../service/database';
-import {ArrowLeft2, ArrowRight2} from 'iconsax-react-native';
+import {ArrowLeft2, ArrowRight2, CloudFog} from 'iconsax-react-native';
 
 const HomeScreen = ({navigation}) => {
   const [weekAppointments, setWeekAppointments] = useState([]);
@@ -26,6 +27,12 @@ const HomeScreen = ({navigation}) => {
     const monday = subDays(today, dayOfWeek === 0 ? 6 : dayOfWeek - 1); // Haftanın Pazartesi gününü bul
     return startOfDay(monday);
   });
+
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  console.log('açıldı modal', modalVisible);
+  console.log('aselectedAppointment', selectedAppointment);
 
   const [stats, setStats] = useState({
     today: 0,
@@ -145,11 +152,10 @@ const HomeScreen = ({navigation}) => {
                   isWeekend && !isCurrentDay && styles.weekendAppointmentItem,
                   isCurrentDay && styles.todayAppointmentItem,
                 ]}
-                onPress={() =>
-                  navigation.navigate('AppointmentsScreen', {
-                    appointmentId: appointment.id,
-                  })
-                }>
+                onPress={() => {
+                  setSelectedAppointment(appointment); // Seçilen randevuyu güncelle
+                  setModalVisible(true); // Modal'ı aç
+                }}>
                 <Text style={styles.appointmentTime}>
                   {format(new Date(appointment.date), 'HH:mm')}
                 </Text>
@@ -216,6 +222,42 @@ const HomeScreen = ({navigation}) => {
         </TouchableOpacity>
       </View>
       <ScrollView style={styles.weekContainer}>{renderWeek()}</ScrollView>
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalFrame}>
+            <View style={styles.modalContent}>
+              {selectedAppointment ? (
+                <>
+                  <Text style={styles.modalTitle}>
+                    {selectedAppointment.title}
+                  </Text>
+                  <Text style={styles.modalTime}>
+                    {format(new Date(selectedAppointment.date), 'HH:mm')}
+                  </Text>
+                  <Text style={styles.modalContact}>
+                    {selectedAppointment.contact_name}
+                  </Text>
+                  <Text style={styles.modalDescription}>
+                    {selectedAppointment.description}
+                  </Text>
+
+                  <TouchableOpacity
+                    onPress={() => setModalVisible(false)}
+                    style={styles.closeButton}>
+                    <Text style={styles.closeButtonText}>Kapat</Text>
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <Text>Yükleniyor...</Text>
+              )}
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -363,6 +405,55 @@ const styles = StyleSheet.create({
   afterWeek: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalFrame: {
+    width: '80%',
+    backgroundColor: 'white',
+    padding: 10,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '100%',
+    backgroundColor: 'white',
+    borderWidth: 2,
+    borderColor: 'gray',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  modalTime: {
+    fontSize: 16,
+    marginVertical: 5,
+  },
+  modalContact: {
+    fontSize: 16,
+    color: 'gray',
+  },
+  modalDescription: {
+    fontSize: 14,
+    marginTop: 10,
+  },
+  closeButton: {
+    marginTop: 15,
+    padding: 10,
+    backgroundColor: '#ff5c5c',
+    borderRadius: 5,
+  },
+  closeButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
 
