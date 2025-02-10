@@ -16,6 +16,7 @@ import {
   getPastAppointments,
 } from '../service/database';
 import {Calendar, Edit2, Trash} from 'iconsax-react-native';
+import {useFocusEffect} from '@react-navigation/native';
 
 const PastAppointmentsScreen = ({navigation}) => {
   const [pastAppointments, setPastAppointments] = useState([]);
@@ -246,7 +247,7 @@ const styles = StyleSheet.create({
 
   appointmentItem: {
     backgroundColor: '#f0f4f7',
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: '#f44336',
     borderRadius: 15,
     marginBottom: 20,

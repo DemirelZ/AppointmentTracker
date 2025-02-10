@@ -116,9 +116,9 @@ const App = () => {
                 variant={focused ? 'Bold' : 'Outline'}
               />
             ),
-            unmountOnBlur: true,
           }}
         />
+
         <Tab.Screen
           name="Contacts"
           component={ContactsStack}
