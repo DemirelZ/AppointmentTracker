@@ -6,11 +6,35 @@ import {
   FlatList,
   TouchableOpacity,
   Alert,
+  Modal,
+  Button,
 } from 'react-native';
-import {getAllContacts, deleteContact} from '../service/database';
+import {
+  getAllContacts,
+  deleteContact,
+  fetchAppointmentsByContactId,
+} from '../service/database';
+import {format} from 'date-fns';
+import {tr, enUS, fr} from 'date-fns/locale';
 
 const ContactListScreen = ({navigation}) => {
   const [contacts, setContacts] = useState([]);
+  const [selectedContact, setSelectedContact] = useState(null);
+  const [appointments, setAppointments] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  // Kullanıcının seçtiği dili al (Bu değeri ayarlardan veya state'ten alabilirsin)
+  const userLanguage = 'tr'; // "tr", "en", "fr" olabilir
+
+  // Locale eşlemesi
+  const localeMap = {
+    tr: tr, // Türkçe
+    en: enUS, // İngilizce
+    fr: fr, // Fransızca
+  };
+
+  // Kullanıcının diline göre locale ayarla
+  const selectedLocale = localeMap[userLanguage] || enUS;
 
   const loadContacts = useCallback(async () => {
     try {
@@ -28,6 +52,13 @@ const ContactListScreen = ({navigation}) => {
 
     return unsubscribe;
   }, [navigation, loadContacts]);
+
+  const handleContactPress = async contact => {
+    setSelectedContact(contact);
+    const appointmentsData = await fetchAppointmentsByContactId(contact.id);
+    setAppointments(appointmentsData);
+    setModalVisible(true);
+  };
 
   const handleDelete = async id => {
     Alert.alert('Kişiyi Sil', 'Bu kişiyi silmek istediğinizden emin misiniz?', [
@@ -51,7 +82,9 @@ const ContactListScreen = ({navigation}) => {
   };
 
   const renderItem = ({item}) => (
-    <View style={styles.contactItem}>
+    <TouchableOpacity
+      onPress={() => handleContactPress(item)}
+      style={styles.contactItem}>
       <View style={styles.contactInfo}>
         <Text style={styles.contactName}>{item.name}</Text>
         {item.phone && <Text style={styles.contactDetail}>{item.phone}</Text>}
@@ -73,7 +106,7 @@ const ContactListScreen = ({navigation}) => {
           <Text style={styles.buttonText}>Sil</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -84,7 +117,10 @@ const ContactListScreen = ({navigation}) => {
         keyExtractor={item => item.id.toString()}
         contentContainerStyle={styles.listContainer}
         ListEmptyComponent={
-          <Text style={{textAlign: 'center'}}>Liste boş</Text>
+          <View
+            style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+            <Text style={{textAlign: 'center'}}>Liste boş</Text>
+          </View>
         }
       />
       <TouchableOpacity
@@ -92,6 +128,75 @@ const ContactListScreen = ({navigation}) => {
         onPress={() => navigation.navigate('AddContactScreen')}>
         <Text style={styles.addButtonText}>+ Yeni Kişi</Text>
       </TouchableOpacity>
+
+      {/* Modal for showing appointments */}
+      <Modal visible={modalVisible} animationType="slide">
+        <View style={{flex: 1, padding: 20}}>
+          {/* Modal Başlık - Toplam Randevu Sayısı */}
+          <Text style={{fontSize: 20, fontWeight: 'bold'}}>
+            {selectedContact?.name} randevu bilgileri:
+          </Text>
+          <Text style={{fontSize: 18, fontWeight: 'bold'}}>
+            {appointments.length} randevu
+          </Text>
+
+          {/* Randevu Listesi */}
+          <FlatList
+            data={appointments}
+            keyExtractor={item => item.id.toString()}
+            showsVerticalScrollIndicator={false}
+            renderItem={({item, index}) => (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  padding: 10,
+                  borderBottomWidth: 1,
+                }}>
+                <View
+                  style={{
+                    paddingHorizontal: 2,
+                    alignItems: 'center',
+                    justifyContent: 'start',
+                  }}>
+                  {/* Sıra Numarası */}
+                  <Text
+                    style={{
+                      fontWeight: 'bold',
+                    }}>
+                    {index + 1}.
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    paddingHorizontal: 6,
+                  }}>
+                  <Text>{item.title}</Text>
+                  <Text>{item.description}</Text>
+                  {/* Tarihi formatlı gösterme */}
+                  <Text style={{color: 'gray'}}>
+                    📅{' '}
+                    {format(new Date(item.date), 'dd MMMM yyyy, EEEE - HH.mm', {
+                      locale: selectedLocale,
+                    })}
+                  </Text>
+                </View>
+              </View>
+            )}
+            ListEmptyComponent={
+              <View
+                style={{
+                  flex: 1, // View'in tüm alanı kaplamasını sağla
+                  justifyContent: 'center', // Dikey ortalama
+                  alignItems: 'center', // Yatay ortalama
+                }}>
+                <Text style={{textAlign: 'center'}}>Liste boş</Text>
+              </View>
+            }
+          />
+
+          <Button title="Kapat" onPress={() => setModalVisible(false)} />
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -108,11 +213,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#5B913B',
     backgroundColor: '#f8f9fa',
     borderRadius: 8,
     padding: 16,
     marginBottom: 12,
-    elevation: 2,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 1},
     shadowOpacity: 0.2,

@@ -227,6 +227,29 @@ export const getAllContacts = () => {
   });
 };
 
+//Bu fonksiyon, seçilen kişinin id değerine göre geçmiş ve gelecek randevuları alır.
+export const fetchAppointmentsByContactId = contactId => {
+  return new Promise((resolve, reject) => {
+    db.transaction(tx => {
+      tx.executeSql(
+        `SELECT * FROM appointments WHERE contact_id = ? ORDER BY date ASC`,
+        [contactId],
+        (_, result) => {
+          let appointments = [];
+          for (let i = 0; i < result.rows.length; i++) {
+            appointments.push(result.rows.item(i));
+          }
+          resolve(appointments);
+        },
+        (_, error) => {
+          console.error('❌ Error fetching appointments:', error);
+          reject(error);
+        },
+      );
+    });
+  });
+};
+
 // Tüm randevuları getirme
 export const getAllAppointments = () => {
   return new Promise((resolve, reject) => {
