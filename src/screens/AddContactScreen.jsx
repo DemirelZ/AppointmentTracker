@@ -7,6 +7,10 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
+  KeyboardAvoidingView,
 } from 'react-native';
 import {addContact, updateContact} from '../service/database';
 import {RadioButton} from 'react-native-paper';
@@ -107,68 +111,77 @@ const AddContactScreen = ({navigation, route}) => {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.form}>
-        <Text style={styles.label}>Ad Soyad *</Text>
-        <TextInput
-          style={styles.input}
-          value={name}
-          onChangeText={setName}
-          placeholder="Ad Soyad"
-        />
-
-        <Text style={styles.label}>Telefon</Text>
-        <TextInput
-          style={styles.input}
-          value={phone}
-          onChangeText={setPhone}
-          placeholder="Telefon numarası"
-          keyboardType="phone-pad"
-        />
-
-        <Text style={styles.label}>E-posta</Text>
-        <TextInput
-          style={styles.input}
-          value={email}
-          onChangeText={setEmail}
-          placeholder="E-posta adresi"
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-        <Text style={styles.label}>Payment Status</Text>
-        <View style={styles.paymentStatusContainer}>
-          <View style={{flexDirection: 'row', gap: 30, marginVertical: 10}}>
-            <CustomRadioButton
-              value="Beklemede"
-              selectedValue={paymentStatus}
-              onChange={setPaymentStatus}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.container}>
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}>
+          <View style={styles.form}>
+            <Text style={styles.label}>Ad Soyad *</Text>
+            <TextInput
+              style={styles.input}
+              value={name}
+              onChangeText={setName}
+              placeholder="Ad Soyad"
             />
-            <CustomRadioButton
-              value="Ödendi"
-              selectedValue={paymentStatus}
-              onChange={setPaymentStatus}
+
+            <Text style={styles.label}>Telefon</Text>
+            <TextInput
+              style={styles.input}
+              value={phone}
+              onChangeText={setPhone}
+              placeholder="Telefon numarası"
+              keyboardType="phone-pad"
             />
+
+            <Text style={styles.label}>E-posta</Text>
+            <TextInput
+              style={styles.input}
+              value={email}
+              onChangeText={setEmail}
+              placeholder="E-posta adresi"
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+
+            <Text style={styles.label}>Payment Status</Text>
+            <View style={styles.paymentStatusContainer}>
+              <View style={styles.radioGroup}>
+                <CustomRadioButton
+                  value="Beklemede"
+                  selectedValue={paymentStatus}
+                  onChange={setPaymentStatus}
+                />
+                <CustomRadioButton
+                  value="Ödendi"
+                  selectedValue={paymentStatus}
+                  onChange={setPaymentStatus}
+                />
+              </View>
+
+              <Text style={styles.label}>
+                Payment Description (date, payment, etc.)
+              </Text>
+              <TextInput
+                style={styles.textarea}
+                value={paymentDescription}
+                onChangeText={setPaymentDescription}
+                placeholder="Add a description if needed"
+                multiline
+              />
+            </View>
+
+            <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+              <Text style={styles.saveButtonText}>
+                {editingContact ? 'Güncelle' : 'Kaydet'}
+              </Text>
+            </TouchableOpacity>
           </View>
-
-          <Text style={styles.label}>
-            Payment Description (date, payment, etc.)
-          </Text>
-          <TextInput
-            style={styles.textarea}
-            value={paymentDescription}
-            onChangeText={setPaymentDescription}
-            placeholder="Add a description if needed"
-            multiline
-          />
-        </View>
-
-        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-          <Text style={styles.saveButtonText}>
-            {editingContact ? 'Güncelle' : 'Kaydet'}
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -177,8 +190,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: 8,
+  },
   form: {
     padding: 16,
+    justifyContent: 'center',
   },
   label: {
     fontSize: 16,
@@ -207,6 +227,11 @@ const styles = StyleSheet.create({
     padding: 16, // İçeriğe boşluk ekliyoruz
     backgroundColor: '#f9f9f9', // Arka plan rengini belirliyoruz
     marginVertical: 0, // Üst ve alt boşluk
+  },
+  radioGroup: {
+    flexDirection: 'row',
+    gap: 30,
+    marginVertical: 10,
   },
   textarea: {
     borderWidth: 1,

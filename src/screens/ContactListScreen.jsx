@@ -24,6 +24,8 @@ const ContactListScreen = ({navigation}) => {
   const [appointments, setAppointments] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
 
+  console.log('appointment for modal', appointments);
+
   // Kullanıcının seçtiği dili al (Bu değeri ayarlardan veya state'ten alabilirsin)
   const userLanguage = 'tr'; // "tr", "en", "fr" olabilir
 
@@ -132,14 +134,16 @@ const ContactListScreen = ({navigation}) => {
 
       {/* Modal for showing appointments */}
       <Modal visible={modalVisible} animationType="slide">
-        <View style={{flex: 1, padding: 20}}>
+        <SafeAreaView style={{flex: 1, padding: 20}}>
           {/* Modal Başlık - Toplam Randevu Sayısı */}
-          <Text style={{fontSize: 20, fontWeight: 'bold'}}>
-            {selectedContact?.name} randevu bilgileri:
-          </Text>
-          <Text style={{fontSize: 18, fontWeight: 'bold'}}>
-            {appointments.length} randevu
-          </Text>
+          <View style={{padding: 10}}>
+            <Text style={{fontSize: 20, fontWeight: 'bold'}}>
+              {selectedContact?.name} randevu bilgileri:
+            </Text>
+            <Text style={{fontSize: 18, fontWeight: 'bold'}}>
+              {appointments.length} randevu
+            </Text>
+          </View>
 
           {/* Randevu Listesi */}
           <FlatList
@@ -195,8 +199,20 @@ const ContactListScreen = ({navigation}) => {
             }
           />
 
-          <Button title="Kapat" onPress={() => setModalVisible(false)} />
-        </View>
+          <TouchableOpacity
+            style={{
+              width: '80%',
+              alignSelf: 'center',
+              marginBottom: 20,
+              backgroundColor: '#f44336',
+              padding: 10,
+              borderRadius: 8,
+              alignItems: 'center',
+            }}
+            onPress={() => setModalVisible(false)}>
+            <Text style={{color: 'white', fontSize: 16}}>Kapat</Text>
+          </TouchableOpacity>
+        </SafeAreaView>
       </Modal>
     </SafeAreaView>
   );
