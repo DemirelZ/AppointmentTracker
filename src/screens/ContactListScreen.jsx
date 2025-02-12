@@ -8,6 +8,7 @@ import {
   Alert,
   Modal,
   Button,
+  SafeAreaView,
 } from 'react-native';
 import {
   getAllContacts,
@@ -110,7 +111,7 @@ const ContactListScreen = ({navigation}) => {
   );
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <FlatList
         data={contacts}
         renderItem={renderItem}
@@ -197,7 +198,7 @@ const ContactListScreen = ({navigation}) => {
           <Button title="Kapat" onPress={() => setModalVisible(false)} />
         </View>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 };
 

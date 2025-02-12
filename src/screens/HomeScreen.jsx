@@ -415,6 +415,7 @@ const styles = StyleSheet.create({
   },
   modalFrame: {
     width: '80%',
+
     backgroundColor: 'white',
     padding: 10,
     borderRadius: 10,
