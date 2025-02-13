@@ -8,6 +8,7 @@ import {
 } from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {Calendar, Profile, AddSquare, Personalcard} from 'iconsax-react-native';
 
 // Screens
@@ -80,62 +81,65 @@ const App = () => {
   }, []);
 
   return (
-    <NavigationContainer>
-      <Tab.Navigator
-        screenOptions={{
-          tabBarActiveTintColor: '#2196F3',
-          tabBarInactiveTintColor: '#999',
-          tabBarStyle: {
-            height: 66,
-            paddingTop: 10,
-          },
-        }}>
-        <Tab.Screen
-          name="Home"
-          component={HomeScreen}
-          options={{
-            title: 'Takvim',
-            tabBarIcon: ({color, focused}) => (
-              <Calendar
-                size={focused ? 30 : 24}
-                color={color}
-                variant={focused ? 'Bold' : 'Outline'}
-              />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name="Appointments"
-          component={AppointmentsStack}
-          options={{
-            headerShown: false,
-            tabBarIcon: ({color, focused}) => (
-              <AddSquare
-                size={focused ? 30 : 24}
-                color={color}
-                variant={focused ? 'Bold' : 'Outline'}
-              />
-            ),
-          }}
-        />
+    <SafeAreaProvider>
+      <NavigationContainer>
+        <Tab.Navigator
+          screenOptions={{
+            tabBarActiveTintColor: '#2196F3',
+            tabBarInactiveTintColor: '#999',
+            tabBarStyle: {
+              height: 70,
+              paddingTop: 0,
+            },
+            safeAreaInsets: {bottom: 20},
+          }}>
+          <Tab.Screen
+            name="Home"
+            component={HomeScreen}
+            options={{
+              title: 'Takvim',
+              tabBarIcon: ({color, focused}) => (
+                <Calendar
+                  size={focused ? 30 : 24}
+                  color={color}
+                  variant={focused ? 'Bold' : 'Outline'}
+                />
+              ),
+            }}
+          />
+          <Tab.Screen
+            name="Appointments"
+            component={AppointmentsStack}
+            options={{
+              headerShown: false,
+              tabBarIcon: ({color, focused}) => (
+                <AddSquare
+                  size={focused ? 30 : 24}
+                  color={color}
+                  variant={focused ? 'Bold' : 'Outline'}
+                />
+              ),
+            }}
+          />
 
-        <Tab.Screen
-          name="Contacts"
-          component={ContactsStack}
-          options={{
-            headerShown: false,
-            tabBarIcon: ({color, focused}) => (
-              <Personalcard
-                size={focused ? 30 : 24}
-                color={color}
-                variant={focused ? 'Bold' : 'Outline'}
-              />
-            ),
-            unmountOnBlur: true,
-          }}
-        />
-      </Tab.Navigator>
-    </NavigationContainer>
+          <Tab.Screen
+            name="Contacts"
+            component={ContactsStack}
+            options={{
+              headerShown: false,
+              tabBarIcon: ({color, focused}) => (
+                <Personalcard
+                  size={focused ? 30 : 24}
+                  color={color}
+                  variant={focused ? 'Bold' : 'Outline'}
+                />
+              ),
+              unmountOnBlur: true,
+            }}
+          />
+        </Tab.Navigator>
+      </NavigationContainer>
+    </SafeAreaProvider>
   );
 };
 

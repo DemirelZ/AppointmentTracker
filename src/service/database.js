@@ -378,7 +378,44 @@ export const deletePastAppointments = () => {
 //   });
 // };
 
-// Belirli bir tarih aralığındaki randevuları getirme
+// Belirli bir tarih aralığındaki randevuları getirme Bu ikincisiydi
+// export const getAppointmentsByDateRange = async (startDate, endDate) => {
+//   return new Promise((resolve, reject) => {
+//     const start = new Date(startDate);
+//     start.setHours(0, 0, 0, 0);
+//     const end = new Date(endDate);
+//     end.setHours(23, 59, 59, 999);
+
+//     console.log(
+//       '📅 SQL Query Tarih Aralığı:',
+//       start.toISOString(),
+//       end.toISOString(),
+//     );
+
+//     db.transaction(tx => {
+//       tx.executeSql(
+//         `SELECT appointments.*, contacts.name as contact_name
+//          FROM appointments
+//          LEFT JOIN contacts ON appointments.contact_id = contacts.id
+//          WHERE date >= ? AND date <= ?
+//          ORDER BY date ASC, appointments.created_at DESC`,
+//         [start.toISOString(), end.toISOString()],
+//         (_, result) => {
+//           console.log('✅ SQL Sorgu Başarılı:', result.rows.raw());
+//           resolve(result.rows.raw());
+//         },
+//         (_, error) => {
+//           console.error('❌ SQL Hatası:', error);
+//           reject(
+//             new Error('SQL sorgusu başarısız oldu: ' + JSON.stringify(error)),
+//           );
+//         },
+//       );
+//     });
+//   });
+// };
+
+//Belirli bir tarih aralığındaki randevuları getirme
 export const getAppointmentsByDateRange = async (startDate, endDate) => {
   return new Promise((resolve, reject) => {
     const start = new Date(startDate);
@@ -394,7 +431,9 @@ export const getAppointmentsByDateRange = async (startDate, endDate) => {
 
     db.transaction(tx => {
       tx.executeSql(
-        `SELECT appointments.*, contacts.name as contact_name 
+        `SELECT appointments.*, 
+                contacts.name AS contact_name, 
+                contacts.phone AS contact_phone 
          FROM appointments 
          LEFT JOIN contacts ON appointments.contact_id = contacts.id 
          WHERE date >= ? AND date <= ?

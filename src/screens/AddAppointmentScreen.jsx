@@ -8,6 +8,10 @@ import {
   ScrollView,
   Alert,
   Modal,
+  TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
 } from 'react-native';
 import {format} from 'date-fns';
 import {tr} from 'date-fns/locale';
@@ -91,7 +95,7 @@ const AddAppointmentScreen = ({navigation, route}) => {
     }
 
     if (!selectedContact) {
-      Alert.alert('Hata', 'Lütfen bir kişi seçiniz.');
+      Alert.alert('Uyarı', 'Lütfen bir kişi seçiniz.');
       return;
     }
 
@@ -209,99 +213,105 @@ const AddAppointmentScreen = ({navigation, route}) => {
   );
 
   return (
-    <>
-      <ScrollView style={styles.container}>
-        <View style={styles.form}>
-          <Text style={styles.label}>Kişi</Text>
-          <View style={styles.contactSelectionContainer}>
-            {selectedContact ? (
-              <View style={styles.selectedContactContainer}>
-                <View>
-                  <Text style={styles.selectedContactText}>
-                    {selectedContactDetails.name}
-                  </Text>
-                  {selectedContactDetails.phone && (
-                    <Text style={styles.selectedContactPhoneText}>
-                      {selectedContactDetails.phone}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{flex: 1}}>
+        <ScrollView style={styles.container}>
+          <View style={styles.form}>
+            <Text style={styles.label}>Kişi</Text>
+            <View style={styles.contactSelectionContainer}>
+              {selectedContact ? (
+                <View style={styles.selectedContactContainer}>
+                  <View>
+                    <Text style={styles.selectedContactText}>
+                      {selectedContactDetails.name}
                     </Text>
-                  )}
+                    {selectedContactDetails.phone && (
+                      <Text style={styles.selectedContactPhoneText}>
+                        {selectedContactDetails.phone}
+                      </Text>
+                    )}
+                  </View>
+                  <TouchableOpacity
+                    style={styles.changeContactButton}
+                    onPress={() => setShowContactModal(true)}>
+                    <Text style={styles.changeContactButtonText}>Değiştir</Text>
+                  </TouchableOpacity>
                 </View>
+              ) : (
                 <TouchableOpacity
-                  style={styles.changeContactButton}
+                  style={styles.selectContactButton}
                   onPress={() => setShowContactModal(true)}>
-                  <Text style={styles.changeContactButtonText}>Değiştir</Text>
+                  <Text style={styles.selectContactButtonText}>Kişi Seç</Text>
                 </TouchableOpacity>
-              </View>
-            ) : (
-              <TouchableOpacity
-                style={styles.selectContactButton}
-                onPress={() => setShowContactModal(true)}>
-                <Text style={styles.selectContactButtonText}>Kişi Seç</Text>
-              </TouchableOpacity>
-            )}
+              )}
+            </View>
+
+            <Text style={styles.label}>Başlık</Text>
+            <TextInput
+              style={styles.input}
+              value={title}
+              onChangeText={setTitle}
+              placeholder="Randevu başlığı"
+            />
+
+            <Text style={styles.label}>Açıklama</Text>
+            <TextInput
+              style={[styles.input, styles.textArea]}
+              value={description}
+              onChangeText={setDescription}
+              placeholder="Randevu açıklaması"
+              multiline
+              numberOfLines={4}
+            />
+
+            <Text style={styles.label}>Tarih</Text>
+            <TouchableOpacity
+              style={styles.dateButton}
+              onPress={() => setShowDatePickerModal(true)}>
+              <Text style={styles.dateButtonText}>
+                {format(date, 'PPP', {locale: tr})}
+              </Text>
+            </TouchableOpacity>
+
+            <Text style={styles.label}>Saat</Text>
+            <TouchableOpacity
+              style={styles.dateButton}
+              onPress={() => setShowTimePickerModal(true)}>
+              <Text style={styles.dateButtonText}>
+                {format(date, 'HH:mm', {locale: tr})}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+              <Text style={styles.saveButtonText}>
+                {editingAppointment ? 'Güncelle' : 'Kaydet'}
+              </Text>
+            </TouchableOpacity>
           </View>
-          <Text style={styles.label}>Başlık</Text>
-          <TextInput
-            style={styles.input}
-            value={title}
-            onChangeText={setTitle}
-            placeholder="Randevu başlığı"
-          />
+        </ScrollView>
 
-          <Text style={styles.label}>Açıklama</Text>
-          <TextInput
-            style={[styles.input, styles.textArea]}
-            value={description}
-            onChangeText={setDescription}
-            placeholder="Randevu açıklaması"
-            multiline
-            numberOfLines={4}
-          />
+        {/* Modals */}
+        <ContactSelectionModal />
 
-          <Text style={styles.label}>Tarih</Text>
-          <TouchableOpacity
-            style={styles.dateButton}
-            onPress={() => setShowDatePickerModal(true)}>
-            <Text style={styles.dateButtonText}>
-              {format(date, 'PPP', {locale: tr})}
-            </Text>
-          </TouchableOpacity>
+        <DateTimePickerModal
+          visible={showDatePickerModal}
+          onClose={() => setShowDatePickerModal(false)}
+          onSelect={handleDateSelect}
+          initialDate={date}
+          mode="date"
+        />
 
-          <Text style={styles.label}>Saat</Text>
-          <TouchableOpacity
-            style={styles.dateButton}
-            onPress={() => setShowTimePickerModal(true)}>
-            <Text style={styles.dateButtonText}>
-              {format(date, 'HH:mm', {locale: tr})}
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-            <Text style={styles.saveButtonText}>
-              {editingAppointment ? 'Güncelle' : 'Kaydet'}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-
-      <ContactSelectionModal />
-
-      <DateTimePickerModal
-        visible={showDatePickerModal}
-        onClose={() => setShowDatePickerModal(false)}
-        onSelect={handleDateSelect}
-        initialDate={date}
-        mode="date"
-      />
-
-      <DateTimePickerModal
-        visible={showTimePickerModal}
-        onClose={() => setShowTimePickerModal(false)}
-        onSelect={handleTimeSelect}
-        initialDate={date}
-        mode="time"
-      />
-    </>
+        <DateTimePickerModal
+          visible={showTimePickerModal}
+          onClose={() => setShowTimePickerModal(false)}
+          onSelect={handleTimeSelect}
+          initialDate={date}
+          mode="time"
+        />
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 };
 

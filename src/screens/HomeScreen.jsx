@@ -31,6 +31,7 @@ const HomeScreen = ({navigation}) => {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
+  console.log('weekAppointments', weekAppointments);
   console.log('açıldı modal', modalVisible);
   console.log('aselectedAppointment', selectedAppointment);
 
@@ -225,35 +226,61 @@ const HomeScreen = ({navigation}) => {
       <Modal
         visible={modalVisible}
         transparent={true}
-        animationType="slide"
+        animationType="fade"
         onRequestClose={() => setModalVisible(false)}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalFrame}>
-            <View style={styles.modalContent}>
-              {selectedAppointment ? (
-                <>
-                  <Text style={styles.modalTitle}>
-                    {selectedAppointment.title}
-                  </Text>
-                  <Text style={styles.modalTime}>
-                    {format(new Date(selectedAppointment.date), 'HH:mm')}
-                  </Text>
-                  <Text style={styles.modalContact}>
-                    {selectedAppointment.contact_name}
-                  </Text>
-                  <Text style={styles.modalDescription}>
-                    {selectedAppointment.description}
-                  </Text>
+        <View style={styles.overlay}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalFrame}>
+              <View style={styles.modalContent}>
+                {selectedAppointment ? (
+                  <>
+                    <Text
+                      style={styles.modalTitle}
+                      numberOfLines={3}
+                      ellipsizeMode="tail">
+                      {selectedAppointment.title}
+                    </Text>
 
-                  <TouchableOpacity
-                    onPress={() => setModalVisible(false)}
-                    style={styles.closeButton}>
-                    <Text style={styles.closeButtonText}>Kapat</Text>
-                  </TouchableOpacity>
-                </>
-              ) : (
-                <Text>Yükleniyor...</Text>
-              )}
+                    <View style={styles.detailContainer}>
+                      <Text style={styles.modalLabel}>Saat:</Text>
+                      <Text style={styles.modalValue}>
+                        {format(new Date(selectedAppointment.date), 'HH:mm')}
+                      </Text>
+                    </View>
+
+                    <View style={styles.detailContainer}>
+                      <Text style={styles.modalLabel}>İletişim:</Text>
+                      <Text style={styles.modalValue}>
+                        {selectedAppointment.contact_name}
+                      </Text>
+                    </View>
+
+                    <View style={styles.detailContainer}>
+                      <Text style={styles.modalLabel}>Telefon:</Text>
+                      <Text style={styles.modalValue}>
+                        {selectedAppointment.contact_phone}
+                      </Text>
+                    </View>
+
+                    <View style={styles.descriptionContainer}>
+                      <Text style={styles.modalLabel}>Açıklama:</Text>
+                      <ScrollView style={styles.scrollView}>
+                        <Text style={styles.modalDescription}>
+                          {selectedAppointment.description}
+                        </Text>
+                      </ScrollView>
+                    </View>
+
+                    <TouchableOpacity
+                      onPress={() => setModalVisible(false)}
+                      style={styles.closeButton}>
+                      <Text style={styles.closeButtonText}>Kapat</Text>
+                    </TouchableOpacity>
+                  </>
+                ) : (
+                  <Text style={styles.loadingText}>Yükleniyor...</Text>
+                )}
+              </View>
             </View>
           </View>
         </View>
@@ -407,54 +434,74 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  modalContainer: {
+  overlay: {
     flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Koyu şeffaf arka plan
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
-  modalFrame: {
-    width: '80%',
-
+  modalContainer: {
+    width: '85%',
     backgroundColor: 'white',
-    padding: 10,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  modalContent: {
-    width: '100%',
-    backgroundColor: 'white',
-    borderWidth: 2,
-    borderColor: 'gray',
+    borderRadius: 15,
     padding: 20,
-    borderRadius: 10,
-    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 5,
   },
   modalTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 10,
+    color: '#333',
   },
-  modalTime: {
-    fontSize: 16,
-    marginVertical: 5,
+  detailContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 5,
   },
-  modalContact: {
+  modalLabel: {
+    marginBottom: 10,
     fontSize: 16,
-    color: 'gray',
+    fontWeight: 'bold',
+    color: '#666',
+  },
+  modalValue: {
+    fontSize: 16,
+    color: '#444',
+  },
+  descriptionContainer: {
+    marginVertical: 10,
+    padding: 10,
+    backgroundColor: '#f8f8f8',
+    borderRadius: 10,
+  },
+  scrollView: {
+    maxHeight: 120, // Açıklamanın yüksekliği sınırlı olacak, kaydırılabilir
   },
   modalDescription: {
-    fontSize: 14,
-    marginTop: 10,
+    fontSize: 15,
+    color: '#555',
   },
   closeButton: {
     marginTop: 15,
-    padding: 10,
-    backgroundColor: '#ff5c5c',
-    borderRadius: 5,
+    backgroundColor: '#007AFF',
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: 'center',
   },
   closeButtonText: {
     color: 'white',
+    fontSize: 16,
     fontWeight: 'bold',
+  },
+  loadingText: {
+    textAlign: 'center',
+    fontSize: 16,
+    color: '#666',
   },
 });
 

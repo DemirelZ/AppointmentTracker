@@ -9,6 +9,7 @@ import {
   Modal,
   Button,
   SafeAreaView,
+  ScrollView,
 } from 'react-native';
 import {
   getAllContacts,
@@ -133,86 +134,59 @@ const ContactListScreen = ({navigation}) => {
       </TouchableOpacity>
 
       {/* Modal for showing appointments */}
-      <Modal visible={modalVisible} animationType="slide">
-        <SafeAreaView style={{flex: 1, padding: 20}}>
-          {/* Modal Başlık - Toplam Randevu Sayısı */}
-          <View style={{padding: 10}}>
-            <Text style={{fontSize: 20, fontWeight: 'bold'}}>
-              {selectedContact?.name} randevu bilgileri:
-            </Text>
-            <Text style={{fontSize: 18, fontWeight: 'bold'}}>
-              {appointments.length} randevu
-            </Text>
-          </View>
+      <Modal visible={modalVisible} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <SafeAreaView style={styles.modalContainer}>
+            {/* Modal Başlık */}
+            <View style={styles.header}>
+              <Text style={styles.headerTitle}>
+                {selectedContact?.name} - Randevular
+              </Text>
+              <Text style={styles.headerSubtitle}>
+                {appointments.length} randevu bulundu
+              </Text>
+            </View>
 
-          {/* Randevu Listesi */}
-          <FlatList
-            data={appointments}
-            keyExtractor={item => item.id.toString()}
-            showsVerticalScrollIndicator={false}
-            renderItem={({item, index}) => (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  padding: 10,
-                  borderBottomWidth: 1,
-                }}>
-                <View
-                  style={{
-                    paddingHorizontal: 2,
-                    alignItems: 'center',
-                    justifyContent: 'start',
-                  }}>
-                  {/* Sıra Numarası */}
-                  <Text
-                    style={{
-                      fontWeight: 'bold',
-                    }}>
-                    {index + 1}.
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    paddingHorizontal: 6,
-                  }}>
-                  <Text>{item.title}</Text>
-                  <Text>{item.description}</Text>
-                  {/* Tarihi formatlı gösterme */}
-                  <Text style={{color: 'gray'}}>
-                    📅{' '}
-                    {format(new Date(item.date), 'dd MMMM yyyy, EEEE - HH.mm', {
-                      locale: selectedLocale,
-                    })}
-                  </Text>
-                </View>
-              </View>
-            )}
-            ListEmptyComponent={
-              <View
-                style={{
-                  flex: 1, // View'in tüm alanı kaplamasını sağla
-                  justifyContent: 'center', // Dikey ortalama
-                  alignItems: 'center', // Yatay ortalama
-                }}>
-                <Text style={{textAlign: 'center'}}>Liste boş</Text>
-              </View>
-            }
-          />
+            {/* Randevu Listesi */}
+            <FlatList
+              data={appointments}
+              keyExtractor={item => item.id.toString()}
+              showsVerticalScrollIndicator={false}
+              renderItem={({item, index}) => (
+                <View style={styles.appointmentCard}>
+                  <Text style={styles.index}>{index + 1}.</Text>
+                  <View style={styles.textContainer}>
+                    <Text style={styles.title}>{item.title}</Text>
+                    <ScrollView style={styles.scrollView}>
+                      <Text style={styles.description}>{item.description}</Text>
+                    </ScrollView>
 
-          <TouchableOpacity
-            style={{
-              width: '80%',
-              alignSelf: 'center',
-              marginBottom: 20,
-              backgroundColor: '#f44336',
-              padding: 10,
-              borderRadius: 8,
-              alignItems: 'center',
-            }}
-            onPress={() => setModalVisible(false)}>
-            <Text style={{color: 'white', fontSize: 16}}>Kapat</Text>
-          </TouchableOpacity>
-        </SafeAreaView>
+                    <Text style={styles.date}>
+                      📅{' '}
+                      {format(
+                        new Date(item.date),
+                        'dd MMMM yyyy, EEEE - HH:mm',
+                        {locale: tr},
+                      )}
+                    </Text>
+                  </View>
+                </View>
+              )}
+              ListEmptyComponent={
+                <View style={styles.emptyContainer}>
+                  <Text style={styles.emptyText}>Henüz randevu eklenmedi.</Text>
+                </View>
+              }
+            />
+
+            {/* Kapat Butonu */}
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setModalVisible(false)}>
+              <Text style={styles.closeButtonText}>Kapat</Text>
+            </TouchableOpacity>
+          </SafeAreaView>
+        </View>
       </Modal>
     </SafeAreaView>
   );
@@ -277,58 +251,6 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
 
-  // contactItem: {
-  //   flexDirection: 'row',
-  //   padding: 16,
-  //   marginBottom: 12,
-  //   borderRadius: 8,
-  //   backgroundColor: '#fff',
-  //   shadowColor: '#000',
-  //   shadowOffset: {width: 0, height: 2},
-  //   shadowOpacity: 0.1,
-  //   shadowRadius: 5,
-  //   elevation: 3, // Android için gölge
-  //   justifyContent: 'space-between',
-  // },
-  // contactInfo: {
-  //   flex: 1,
-  //   justifyContent: 'center',
-  // },
-  // contactName: {
-  //   fontSize: 18,
-  //   fontWeight: 'bold',
-  //   color: '#333',
-  // },
-  // contactDetail: {
-  //   fontSize: 14,
-  //   color: '#666',
-  //   marginTop: 4,
-  // },
-  // buttonContainer: {
-  //   flexDirection: 'row',
-  //   justifyContent: 'flex-end',
-  //   alignItems: 'center',
-  // },
-  // button: {
-  //   paddingHorizontal: 16,
-  //   paddingVertical: 8,
-  //   borderRadius: 20,
-  //   marginLeft: 8,
-  //   justifyContent: 'center',
-  //   alignItems: 'center',
-  // },
-  // editButton: {
-  //   backgroundColor: '#4CAF50',
-  // },
-  // deleteButton: {
-  //   backgroundColor: '#F44336',
-  // },
-  // buttonText: {
-  //   color: '#fff',
-  //   fontSize: 14,
-  //   fontWeight: '500',
-  // },
-
   addButton: {
     position: 'absolute',
     bottom: 24,
@@ -346,6 +268,100 @@ const styles = StyleSheet.create({
   },
   addButtonText: {
     color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+
+  // Modal styls
+
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)', // Modal arkaplanına hafif siyahlık ekleme
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    width: '90%',
+    backgroundColor: '#fff',
+    borderRadius: 15,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  header: {
+    alignItems: 'center',
+    marginVertical: 18,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  headerSubtitle: {
+    fontSize: 16,
+    color: '#666',
+  },
+  appointmentCard: {
+    flexDirection: 'row',
+    backgroundColor: '#f9f9f9',
+    padding: 12,
+    marginBottom: 10,
+    marginHorizontal: 6,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 1},
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  index: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    paddingRight: 10,
+    color: '#444',
+  },
+  textContainer: {
+    flex: 1,
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#222',
+  },
+  description: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 2,
+  },
+  scrollView: {
+    maxHeight: 120, // Açıklamanın yüksekliği sınırlı olacak, kaydırılabilir
+    marginVertical: 8,
+  },
+  date: {
+    fontSize: 13,
+    color: '#888',
+    marginTop: 4,
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    padding: 20,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#999',
+  },
+  closeButton: {
+    backgroundColor: '#007bff',
+    padding: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginVertical: 12,
+    marginHorizontal: 6,
+  },
+  closeButtonText: {
+    color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
   },
