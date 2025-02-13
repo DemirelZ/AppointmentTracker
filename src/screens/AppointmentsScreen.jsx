@@ -7,14 +7,28 @@ import {
   TouchableOpacity,
   Alert,
   Platform,
+  Modal,
+  TextInput,
+  Button,
 } from 'react-native';
 import {format} from 'date-fns';
 import {tr} from 'date-fns/locale';
-import {deleteAppointment, getUpcomingAppointments} from '../service/database';
-import {Calendar, Edit2, Trash} from 'iconsax-react-native';
+import {
+  deleteAppointment,
+  getUpcomingAppointments,
+  updatePaymentStatus,
+} from '../service/database';
+import {Calendar, Edit2, Moneys, Trash} from 'iconsax-react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 const AppointmentsScreen = ({navigation}) => {
   const [upcomingAppointments, setUpcomingAppointments] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [newPaymentStatus, setNewPaymentStatus] = useState('');
+  const [newAmount, setNewAmount] = useState('');
+  const [newPaymentMethod, setNewPaymentMethod] = useState('');
+
+  console.log('upcomingAppointments', upcomingAppointments);
 
   const loadAppointments = useCallback(async () => {
     try {
@@ -58,6 +72,29 @@ const AppointmentsScreen = ({navigation}) => {
     );
   };
 
+  const handlePaymentPress = async () => {
+    setModalVisible(true);
+  };
+
+  const handleUpdatePaymentStatus = () => {
+    // Burada, randevunun id'sini ve gerekli diğer bilgileri kullanarak ödeme durumu güncelleme fonksiyonunu çağırıyoruz.
+    updatePaymentStatus(
+      appointment.id, // appointmentId
+      appointment.contact_id, // contactId
+      parseFloat(newAmount), // newAmount
+      newPaymentStatus, // newPaymentStatus
+      newPaymentMethod, // newPaymentMethod
+      db,
+    )
+      .then(() => {
+        console.log('Ödeme durumu başarıyla güncellendi');
+        setModalVisible(false); // Modal'ı kapat
+      })
+      .catch(error => {
+        console.error('Ödeme durumu güncellenirken hata oluştu:', error);
+      });
+  };
+
   const renderItem = ({item}) => (
     <View style={styles.appointmentItem}>
       <View style={styles.appointmentHeader}>
@@ -74,6 +111,11 @@ const AppointmentsScreen = ({navigation}) => {
             style={[styles.button, styles.deleteButton]}
             onPress={() => handleDelete(item.id)}>
             <Trash size={20} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.button, styles.paymentButton]}
+            onPress={() => handlePaymentPress(item.id)}>
+            <Moneys size={20} color="#fff" />
           </TouchableOpacity>
         </View>
       </View>
@@ -92,49 +134,7 @@ const AppointmentsScreen = ({navigation}) => {
 
         <Text style={styles.contactName}>Kişi: {item.contact_name}</Text>
       </View>
-
-      {/* <View
-        style={[
-          styles.countdownContainer,
-          {
-            borderWidth: 2,
-            borderColor: calculateTimeLeft(item.date).containerColor,
-          },
-        ]}>
-        <Text style={styles.countdownText}>
-          {calculateTimeLeft(item.date).timeLeft}
-        </Text>
-      </View> */}
     </View>
-
-    /* <View style={styles.appointmentItem}>
-      <View style={styles.appointmentHeader}>
-        <Text style={styles.appointmentTitle}>{item.title}</Text>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={[styles.button, styles.editButton]}
-            onPress={() =>
-              navigation.navigate('AddAppointmentScreen', {
-                appointment: item,
-              })
-            }>
-            <Text style={styles.buttonText}>Düzenle</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button, styles.deleteButton]}
-            onPress={() => handleDelete(item.id)}>
-            <Text style={styles.buttonText}>Sil</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-      <Text style={styles.appointmentDate}>
-        {format(new Date(item.date), 'PPP - HH:mm', {locale: tr})}
-      </Text>
-      {item.description && (
-        <Text style={styles.appointmentDescription}>{item.description}</Text>
-      )}
-      <Text style={styles.contactName}>Kişi: {item.contact_name}</Text>
-    </View> */
   );
 
   return (
@@ -150,6 +150,32 @@ const AppointmentsScreen = ({navigation}) => {
         onPress={() => navigation.navigate('AddAppointmentScreen')}>
         <Text style={styles.addButtonText}>+ Yeni Randevu</Text>
       </TouchableOpacity>
+
+      <Modal
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}>
+        <View>
+          <Text>Ödeme Durumunu Güncelle</Text>
+          <TextInput
+            placeholder="Ödeme Durumu (Ödendi, Beklemede vb.)"
+            value={newPaymentStatus}
+            onChangeText={setNewPaymentStatus}
+          />
+          <TextInput
+            placeholder="Ödeme Miktarı"
+            value={newAmount}
+            keyboardType="numeric"
+            onChangeText={setNewAmount}
+          />
+          <TextInput
+            placeholder="Ödeme Yöntemi"
+            value={newPaymentMethod}
+            onChangeText={setNewPaymentMethod}
+          />
+          <Button title="Güncelle" onPress={handleUpdatePaymentStatus} />
+          <Button title="Kapat" onPress={() => setModalVisible(false)} />
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -280,6 +306,9 @@ const styles = StyleSheet.create({
   deleteButton: {
     backgroundColor: '#f44336',
   },
+  paymentButton: {
+    backgroundColor: '#ba68c8',
+  },
   buttonText: {
     color: '#fff',
     fontSize: 12,
@@ -303,6 +332,99 @@ const styles = StyleSheet.create({
 
   addButtonText: {
     color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+
+  // MODAL
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)', // Modal arkaplanına hafif siyahlık ekleme
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    width: '90%',
+    backgroundColor: '#fff',
+    borderRadius: 15,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  header: {
+    alignItems: 'center',
+    marginVertical: 18,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  headerSubtitle: {
+    fontSize: 16,
+    color: '#666',
+  },
+  appointmentCard: {
+    flexDirection: 'row',
+    backgroundColor: '#f9f9f9',
+    padding: 12,
+    marginBottom: 10,
+    marginHorizontal: 6,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 1},
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  index: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    paddingRight: 10,
+    color: '#444',
+  },
+  textContainer: {
+    flex: 1,
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#222',
+  },
+  description: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 2,
+  },
+  scrollView: {
+    maxHeight: 120, // Açıklamanın yüksekliği sınırlı olacak, kaydırılabilir
+    marginVertical: 8,
+  },
+  date: {
+    fontSize: 13,
+    color: '#888',
+    marginTop: 4,
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    padding: 20,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#999',
+  },
+  closeButton: {
+    backgroundColor: '#007bff',
+    padding: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginVertical: 12,
+    marginHorizontal: 6,
+  },
+  closeButtonText: {
+    color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
   },

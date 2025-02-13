@@ -99,6 +99,29 @@ export const initTables = () => {
           reject(error);
         },
       );
+
+      tx.executeSql(
+        `CREATE TABLE IF NOT EXISTS payments (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            appointment_id INTEGER,  -- Hangi randevuyla ilişkili olduğunu belirtir
+            contact_id INTEGER,      -- Kişinin ID'si
+            amount DECIMAL(10, 2),   -- Ödeme tutarı
+            payment_status TEXT DEFAULT 'Beklemede',  -- Ödeme durumu (Ödendi, Beklemede, İptal Edildi vb.)
+            payment_method TEXT,     -- Ödeme yöntemi (Kredi Kartı, Nakit vb.)
+            payment_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (appointment_id) REFERENCES appointments (id),
+            FOREIGN KEY (contact_id) REFERENCES contacts (id)
+        )`,
+        [],
+        () => {
+          console.log('✅ Payments table created successfully');
+        },
+        (_, error) => {
+          console.error('❌ Error creating payments table:', error);
+          reject(error);
+        },
+      );
     });
   });
 };
@@ -626,6 +649,43 @@ export const getMonthAppointmentsCount = () => {
           resolve(result.rows.raw()[0].count);
         },
         (_, error) => {
+          reject(error);
+        },
+      );
+    });
+  });
+};
+
+// ---------------------- PAYMENT ------------------------------
+
+export const updatePaymentStatus = (
+  appointmentId,
+  contactId,
+  newAmount,
+  newPaymentStatus,
+  newPaymentMethod,
+  db,
+) => {
+  return new Promise((resolve, reject) => {
+    db.transaction(tx => {
+      // 1. Ödeme durumunu güncelle
+      tx.executeSql(
+        `UPDATE payments
+         SET amount = ?, payment_status = ?, payment_method = ?, payment_date = CURRENT_TIMESTAMP
+         WHERE appointment_id = ? AND contact_id = ?`,
+        [
+          newAmount,
+          newPaymentStatus,
+          newPaymentMethod,
+          appointmentId,
+          contactId,
+        ],
+        () => {
+          console.log('✅ Payment status updated successfully');
+          resolve(true);
+        },
+        (_, error) => {
+          console.error('❌ Error updating payment status:', error);
           reject(error);
         },
       );
