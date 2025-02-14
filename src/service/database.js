@@ -656,41 +656,4 @@ export const getMonthAppointmentsCount = () => {
   });
 };
 
-// ---------------------- PAYMENT ------------------------------
-
-export const updatePaymentStatus = (
-  appointmentId,
-  contactId,
-  newAmount,
-  newPaymentStatus,
-  newPaymentMethod,
-  db,
-) => {
-  return new Promise((resolve, reject) => {
-    db.transaction(tx => {
-      // 1. Ödeme durumunu güncelle
-      tx.executeSql(
-        `UPDATE payments
-         SET amount = ?, payment_status = ?, payment_method = ?, payment_date = CURRENT_TIMESTAMP
-         WHERE appointment_id = ? AND contact_id = ?`,
-        [
-          newAmount,
-          newPaymentStatus,
-          newPaymentMethod,
-          appointmentId,
-          contactId,
-        ],
-        () => {
-          console.log('✅ Payment status updated successfully');
-          resolve(true);
-        },
-        (_, error) => {
-          console.error('❌ Error updating payment status:', error);
-          reject(error);
-        },
-      );
-    });
-  });
-};
-
 export default db;

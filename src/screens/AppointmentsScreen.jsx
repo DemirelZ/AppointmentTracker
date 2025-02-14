@@ -70,25 +70,6 @@ const AppointmentsScreen = ({navigation}) => {
     setModalVisible(true);
   };
 
-  const handleUpdatePaymentStatus = () => {
-    // Burada, randevunun id'sini ve gerekli diğer bilgileri kullanarak ödeme durumu güncelleme fonksiyonunu çağırıyoruz.
-    updatePaymentStatus(
-      appointment.id, // appointmentId
-      appointment.contact_id, // contactId
-      parseFloat(newAmount), // newAmount
-      newPaymentStatus, // newPaymentStatus
-      newPaymentMethod, // newPaymentMethod
-      db,
-    )
-      .then(() => {
-        console.log('Ödeme durumu başarıyla güncellendi');
-        setModalVisible(false); // Modal'ı kapat
-      })
-      .catch(error => {
-        console.error('Ödeme durumu güncellenirken hata oluştu:', error);
-      });
-  };
-
   const renderItem = ({item}) => (
     <View style={styles.appointmentItem}>
       <View style={styles.appointmentHeader}>
@@ -121,7 +102,6 @@ const AppointmentsScreen = ({navigation}) => {
             {format(new Date(item.date), 'PPP - HH:mm', {locale: tr})}
           </Text>
         </View>
-
         {item.description && (
           <Text style={styles.appointmentDescription}>{item.description}</Text>
         )}
