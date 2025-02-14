@@ -6,27 +6,21 @@ import {
   FlatList,
   TouchableOpacity,
   Alert,
-  Platform,
   Modal,
   TextInput,
-  Button,
 } from 'react-native';
 import {format} from 'date-fns';
 import {tr} from 'date-fns/locale';
-import {
+import db, {
   deleteAppointment,
   getUpcomingAppointments,
   updatePaymentStatus,
 } from '../service/database';
 import {Calendar, Edit2, Moneys, Trash} from 'iconsax-react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
 
 const AppointmentsScreen = ({navigation}) => {
   const [upcomingAppointments, setUpcomingAppointments] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [newPaymentStatus, setNewPaymentStatus] = useState('');
-  const [newAmount, setNewAmount] = useState('');
-  const [newPaymentMethod, setNewPaymentMethod] = useState('');
 
   console.log('upcomingAppointments', upcomingAppointments);
 
@@ -131,8 +125,7 @@ const AppointmentsScreen = ({navigation}) => {
         {item.description && (
           <Text style={styles.appointmentDescription}>{item.description}</Text>
         )}
-
-        <Text style={styles.contactName}>Kişi: {item.contact_name}</Text>
+        <Text style={styles.appointmentDescription}>{item.contact_name}</Text>
       </View>
     </View>
   );
@@ -150,32 +143,6 @@ const AppointmentsScreen = ({navigation}) => {
         onPress={() => navigation.navigate('AddAppointmentScreen')}>
         <Text style={styles.addButtonText}>+ Yeni Randevu</Text>
       </TouchableOpacity>
-
-      <Modal
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}>
-        <View>
-          <Text>Ödeme Durumunu Güncelle</Text>
-          <TextInput
-            placeholder="Ödeme Durumu (Ödendi, Beklemede vb.)"
-            value={newPaymentStatus}
-            onChangeText={setNewPaymentStatus}
-          />
-          <TextInput
-            placeholder="Ödeme Miktarı"
-            value={newAmount}
-            keyboardType="numeric"
-            onChangeText={setNewAmount}
-          />
-          <TextInput
-            placeholder="Ödeme Yöntemi"
-            value={newPaymentMethod}
-            onChangeText={setNewPaymentMethod}
-          />
-          <Button title="Güncelle" onPress={handleUpdatePaymentStatus} />
-          <Button title="Kapat" onPress={() => setModalVisible(false)} />
-        </View>
-      </Modal>
     </View>
   );
 };
