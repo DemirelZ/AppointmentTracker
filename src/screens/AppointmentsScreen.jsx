@@ -6,30 +6,34 @@ import {
   FlatList,
   TouchableOpacity,
   Alert,
-  Modal,
-  TextInput,
+  ActivityIndicator,
 } from 'react-native';
 import {format} from 'date-fns';
 import {tr} from 'date-fns/locale';
 import db, {
   deleteAppointment,
   getUpcomingAppointments,
-  updatePaymentStatus,
 } from '../service/database';
-import {Calendar, Edit2, Moneys, Trash} from 'iconsax-react-native';
+import {Calendar, Edit2, Trash} from 'iconsax-react-native';
 
 const AppointmentsScreen = ({navigation}) => {
   const [upcomingAppointments, setUpcomingAppointments] = useState([]);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   console.log('upcomingAppointments', upcomingAppointments);
 
   const loadAppointments = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
     try {
       const result = await getUpcomingAppointments();
       setUpcomingAppointments(result);
     } catch (error) {
-      Alert.alert('Hata', 'Randevular yüklenirken bir hata oluştu.');
+      //Alert.alert('Hata', 'Randevular yüklenirken bir hata oluştu.');
+      setError('Randevular yüklenirken bir hata oluştu.');
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
@@ -66,58 +70,82 @@ const AppointmentsScreen = ({navigation}) => {
     );
   };
 
-  const handlePaymentPress = async () => {
-    setModalVisible(true);
+  const getPaymentStatusStyle = status => {
+    if (status === 'Beklemede') {
+      return styles.pendingStatus; // Sarı daire için stil
+    } else if (status === 'Ödendi') {
+      return styles.paidStatus; // Yeşil daire için stil
+    }
+    return styles.defaultStatus; // Varsayılan stil
   };
 
   const renderItem = ({item}) => (
     <View style={styles.appointmentItem}>
-      <View style={styles.appointmentHeader}>
-        <Text style={styles.appointmentTitle}>{item.title}</Text>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={[styles.button, styles.editButton]}
-            onPress={() =>
-              navigation.navigate('AddAppointmentScreen', {appointment: item})
-            }>
-            <Edit2 size={20} color="#fff" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button, styles.deleteButton]}
-            onPress={() => handleDelete(item.id)}>
-            <Trash size={20} color="#fff" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button, styles.paymentButton]}
-            onPress={() => handlePaymentPress(item.id)}>
-            <Moneys size={20} color="#fff" />
-          </TouchableOpacity>
+      <View style={styles.infoContainer}>
+        <View style={styles.appointmentHeader}>
+          <Text style={styles.appointmentTitle}>{item.title}</Text>
         </View>
-      </View>
-      <View style={styles.appointmentDetails}>
-        <View style={styles.dateContainer}>
-          <Calendar size={18} color="#888" />
-
-          <Text style={styles.appointmentDate}>
-            {format(new Date(item.date), 'PPP - HH:mm', {locale: tr})}
+        <View style={styles.appointmentDetails}>
+          <View style={styles.dateContainer}>
+            <Calendar size={18} color="#888" />
+            <Text style={styles.appointmentDate}>
+              {format(new Date(item.date), 'PPP - HH:mm', {locale: tr})}
+            </Text>
+          </View>
+          {item.description && (
+            <Text style={styles.appointmentDescription}>
+              {item.description}
+            </Text>
+          )}
+          <Text style={styles.appointmentContactName}>{item.contact_name}</Text>
+          <Text
+            style={[
+              styles.appointmentDescription,
+              getPaymentStatusStyle(item.payment_status),
+            ]}>
+            Payment: {item.payment_status === 'Beklemede' ? 'Pending' : 'Paid'}
           </Text>
         </View>
-        {item.description && (
-          <Text style={styles.appointmentDescription}>{item.description}</Text>
-        )}
-        <Text style={styles.appointmentDescription}>{item.contact_name}</Text>
+      </View>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={[styles.button, styles.editButton]}
+          onPress={() =>
+            navigation.navigate('AddAppointmentScreen', {appointment: item})
+          }>
+          <Edit2 size={20} color="#fff" />
+          <Text style={styles.editText}>Edit appointment &</Text>
+          <Text style={styles.editText}>payment staus</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.button, styles.deleteButton]}
+          onPress={() => handleDelete(item.id)}>
+          <Trash size={20} color="#fff" />
+          <Text style={styles.editText}>Delete appointment</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={upcomingAppointments}
-        renderItem={renderItem}
-        keyExtractor={item => item.id.toString()}
-        contentContainerStyle={styles.listContainer}
-      />
+      {isLoading && <ActivityIndicator size="large" color="#0000ff" />}
+
+      {error && (
+        <View style={{padding: 10, backgroundColor: 'red', marginBottom: 10}}>
+          <Text style={{color: 'white', textAlign: 'center'}}>{error}</Text>
+        </View>
+      )}
+
+      {!isLoading && !error && (
+        <FlatList
+          data={upcomingAppointments}
+          renderItem={renderItem}
+          keyExtractor={item => item.id.toString()}
+          contentContainerStyle={styles.listContainer}
+        />
+      )}
+
       <TouchableOpacity
         style={styles.addButton}
         onPress={() => navigation.navigate('AddAppointmentScreen')}>
@@ -136,6 +164,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   appointmentItem: {
+    flexDirection: 'row',
     backgroundColor: '#f0f4f7',
     borderRadius: 15,
     marginBottom: 20,
@@ -147,6 +176,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 6,
     elevation: 6,
+  },
+  infoContainer: {
+    flex: 1,
   },
   appointmentHeader: {
     flexDirection: 'row',
@@ -160,8 +192,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
   },
 
   appointmentDetails: {
@@ -209,9 +241,17 @@ const styles = StyleSheet.create({
   },
   editButton: {
     backgroundColor: '#2196F3',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  editText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '500',
   },
   deleteButton: {
     backgroundColor: '#f44336',
+    alignItems: 'center',
   },
   paymentButton: {
     backgroundColor: '#ba68c8',
@@ -295,6 +335,10 @@ const styles = StyleSheet.create({
   textContainer: {
     flex: 1,
   },
+  appointmentContactName: {
+    marginVertical: 10,
+    fontWeight: 'bold',
+  },
   title: {
     fontSize: 16,
     fontWeight: 'bold',
@@ -334,6 +378,22 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+
+  pendingStatus: {
+    color: 'orange', // Sarı tonunda olabilir
+    padding: 5,
+    backgroundColor: 'rgba(255, 255, 0, 0.2)', // Sarı arka plan
+    borderRadius: 50, // Yuvarlak form
+  },
+  paidStatus: {
+    color: 'green', // Yeşil
+    padding: 5,
+    backgroundColor: 'rgba(0, 128, 0, 0.2)', // Yeşil arka plan
+    borderRadius: 50, // Yuvarlak form
+  },
+  defaultStatus: {
+    color: 'gray', // Varsayılan gri renk
   },
 });
 
