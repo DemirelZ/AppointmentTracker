@@ -56,6 +56,71 @@ const DateTimePickerModal = ({
     onClose();
   };
 
+  // Eski calendar
+  // const renderCalendar = () => {
+  //   const start = new Date(
+  //     currentMonth.getFullYear(),
+  //     currentMonth.getMonth(),
+  //     1,
+  //   );
+  //   const days = [];
+  //   start.setDate(start.getDate() - start.getDay());
+
+  //   for (let i = 0; i < 42; i++) {
+  //     const date = addDays(start, i);
+  //     const isCurrentMonth = date.getMonth() === currentMonth.getMonth();
+  //     const isSelected = isSameDay(date, selectedDate);
+  //     const isToday = isSameDay(date, new Date());
+  //     const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+
+  //     days.push(
+  //       <TouchableOpacity
+  //         key={i}
+  //         style={[
+  //           styles.dayButton,
+  //           isWeekend && styles.weekendDay,
+  //           !isCurrentMonth && styles.otherMonthDay,
+  //           isSelected && styles.selectedDay,
+  //           isToday && styles.today,
+  //         ]}
+  //         onPress={() => handleDateSelect(date)}
+  //         disabled={!isCurrentMonth}>
+  //         <Text
+  //           style={[
+  //             styles.dayText,
+  //             isWeekend && styles.weekendDayText,
+  //             !isCurrentMonth && styles.otherMonthDayText,
+  //             isSelected && styles.selectedDayText,
+  //             isToday && styles.todayText,
+  //           ]}>
+  //           {date.getDate()}
+  //         </Text>
+  //       </TouchableOpacity>,
+  //     );
+  //   }
+
+  //   return (
+  //     <View style={styles.calendar}>
+  //       {/* Haftanın günleri */}
+  //       <View style={styles.weekDays}>
+  //         {['Pz', 'Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct'].map((day, index) => (
+  //           <Text
+  //             key={index}
+  //             style={[
+  //               styles.weekDayText,
+  //               (index === 0 || index === 6) && styles.weekendDayHeaderText, // Hafta sonu günleri için özel stil
+  //             ]}>
+  //             {day}
+  //           </Text>
+  //         ))}
+  //       </View>
+
+  //       {/* Günler */}
+  //       <View style={styles.daysContainer}>{days}</View>
+  //     </View>
+  //   );
+  // };
+
   const renderCalendar = () => {
     const start = new Date(
       currentMonth.getFullYear(),
@@ -63,7 +128,11 @@ const DateTimePickerModal = ({
       1,
     );
     const days = [];
-    start.setDate(start.getDate() - start.getDay());
+
+    // Haftanın ilk günü Pazartesi olarak ayarla
+    start.setDate(
+      start.getDate() - (start.getDay() === 0 ? 6 : start.getDay() - 1),
+    );
 
     for (let i = 0; i < 42; i++) {
       const date = addDays(start, i);
@@ -100,14 +169,14 @@ const DateTimePickerModal = ({
 
     return (
       <View style={styles.calendar}>
-        {/* Haftanın günleri */}
+        {/* Haftanın günleri (Pazartesi ile başlıyor) */}
         <View style={styles.weekDays}>
-          {['Pz', 'Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct'].map((day, index) => (
+          {['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pz'].map((day, index) => (
             <Text
               key={index}
               style={[
                 styles.weekDayText,
-                (index === 0 || index === 6) && styles.weekendDayHeaderText, // Hafta sonu günleri için özel stil
+                (index === 5 || index === 6) && styles.weekendDayHeaderText, // Hafta sonu günleri için özel stil
               ]}>
               {day}
             </Text>
@@ -265,24 +334,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     flex: 1,
   },
-  // calendar: {
-  //   paddingHorizontal: 10,
-  // },
-  // weekDays: {
-  //   flexDirection: 'row',
-  //   marginBottom: 10,
-  // },
-  // weekDayText: {
-  //   flex: 1,
-  //   textAlign: 'center',
-  //   color: '#666',
-  //   fontSize: 12,
-  //   fontWeight: '500',
-  // },
-  // daysContainer: {
-  //   flexDirection: 'row',
-  //   flexWrap: 'wrap',
-  // },
 
   calendar: {
     padding: 10,
