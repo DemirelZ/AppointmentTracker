@@ -26,35 +26,38 @@ const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
 import {Button} from 'react-native';
+import {PaperProvider} from 'react-native-paper';
 
 const AppointmentsStack = () => (
-  <Stack.Navigator>
-    <Stack.Screen
-      name="AppointmentsList"
-      component={AppointmentsScreen}
-      options={({navigation}) => ({
-        title: 'Randevular',
-        headerRight: () => (
-          <Button
-            title="Geçmiş"
-            onPress={() => navigation.navigate('PastAppointmentsScreen')}
-          />
-        ),
-      })}
-    />
-    <Stack.Screen
-      name="AddAppointmentScreen"
-      component={AddAppointmentScreen}
-      options={({route}) => ({
-        title: route.params?.appointment ? 'Randevu Düzenle' : 'Yeni Randevu',
-      })}
-    />
-    <Stack.Screen
-      name="PastAppointmentsScreen"
-      component={PastAppointmentsScreen}
-      options={{title: 'Geçmiş Randevular'}}
-    />
-  </Stack.Navigator>
+  <PaperProvider>
+    <Stack.Navigator>
+      <Stack.Screen
+        name="AppointmentsList"
+        component={AppointmentsScreen}
+        options={({navigation}) => ({
+          title: 'Randevular',
+          headerRight: () => (
+            <Button
+              title="Geçmiş"
+              onPress={() => navigation.navigate('PastAppointmentsScreen')}
+            />
+          ),
+        })}
+      />
+      <Stack.Screen
+        name="AddAppointmentScreen"
+        component={AddAppointmentScreen}
+        options={({route}) => ({
+          title: route.params?.appointment ? 'Randevu Düzenle' : 'Yeni Randevu',
+        })}
+      />
+      <Stack.Screen
+        name="PastAppointmentsScreen"
+        component={PastAppointmentsScreen}
+        options={{title: 'Geçmiş Randevular'}}
+      />
+    </Stack.Navigator>
+  </PaperProvider>
 );
 
 const ContactsStack = () => (

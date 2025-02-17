@@ -15,14 +15,20 @@ import {
   deletePastAppointments,
   getPastAppointments,
 } from '../service/database';
-import {Calendar, Edit2, Trash} from 'iconsax-react-native';
+import {ArrowDown2, Calendar, Edit2, Trash} from 'iconsax-react-native';
+import {Picker} from '@react-native-picker/picker';
+import {Button, Menu} from 'react-native-paper';
 
 const PastAppointmentsScreen = ({navigation}) => {
   const [pastAppointments, setPastAppointments] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  console.log('pastAppointments', pastAppointments);
+  const [selectedFilter, setSelectedFilter] = useState('Tümü');
+  const [filteredAppointments, setFilteredAppointments] = useState([]);
+  const [menuVisible, setMenuVisible] = useState(false);
+
+  console.log('pastAppointments filteredAppointments', filteredAppointments);
 
   const loadAppointments = useCallback(async () => {
     setIsLoading(true);
@@ -30,6 +36,7 @@ const PastAppointmentsScreen = ({navigation}) => {
     try {
       const result = await getPastAppointments();
       setPastAppointments(result);
+      filterAppointments(result);
     } catch (error) {
       //Alert.alert('Hata', 'Randevular yüklenirken bir hata oluştu.');
       setError('Randevular yüklenirken bir hata oluştu.');
@@ -45,6 +52,10 @@ const PastAppointmentsScreen = ({navigation}) => {
 
     return unsubscribe;
   }, [navigation, loadAppointments]);
+
+  useEffect(() => {
+    filterAppointments();
+  }, [selectedFilter]);
 
   const handleDelete = async id => {
     Alert.alert(
@@ -108,6 +119,17 @@ const PastAppointmentsScreen = ({navigation}) => {
     return styles.defaultStatus; // Varsayılan stil
   };
 
+  const filterAppointments = (appointments = pastAppointments) => {
+    if (selectedFilter === 'Tümü') {
+      setFilteredAppointments(appointments);
+    } else {
+      const filtered = appointments.filter(
+        appointment => appointment.payment_status === selectedFilter,
+      );
+      setFilteredAppointments(filtered);
+    }
+  };
+
   const renderItem = ({item}) => (
     <View style={styles.appointmentItem}>
       <View style={styles.infoContainer}>
@@ -158,6 +180,51 @@ const PastAppointmentsScreen = ({navigation}) => {
 
   return (
     <View style={styles.container}>
+      {/* Dropdown Butonu */}
+      <View style={styles.menuContainer}>
+        <Menu
+          visible={menuVisible}
+          onDismiss={() => setMenuVisible(false)}
+          anchor={
+            <Button
+              mode="contained"
+              style={styles.dropdownButton}
+              labelStyle={styles.dropdownButtonText}
+              onPress={() => setMenuVisible(true)}>
+              <View style={styles.buttonContent}>
+                <Text style={styles.buttonText}>{selectedFilter}</Text>
+                <ArrowDown2 size={18} color="black" />
+              </View>
+            </Button>
+          }
+          contentStyle={styles.menuContent}>
+          <Menu.Item
+            onPress={() => {
+              setSelectedFilter('Tümü');
+              setMenuVisible(false);
+            }}
+            title="Tümü"
+            titleStyle={styles.menuItemText}
+          />
+          <Menu.Item
+            onPress={() => {
+              setSelectedFilter('Ödendi');
+              setMenuVisible(false);
+            }}
+            title="Ödendi"
+            titleStyle={styles.menuItemText}
+          />
+          <Menu.Item
+            onPress={() => {
+              setSelectedFilter('Beklemede');
+              setMenuVisible(false);
+            }}
+            title="Beklemede"
+            titleStyle={styles.menuItemText}
+          />
+        </Menu>
+      </View>
+
       {isLoading && <ActivityIndicator size="large" color="#0000ff" />}
 
       {error && (
@@ -168,9 +235,11 @@ const PastAppointmentsScreen = ({navigation}) => {
 
       {!isLoading && !error && (
         <FlatList
-          data={pastAppointments}
+          data={filteredAppointments}
           renderItem={renderItem}
-          keyExtractor={item => item.id.toString()}
+          keyExtractor={(item, index) =>
+            item.id ? item.id.toString() : index.toString()
+          }
           contentContainerStyle={styles.listContainer}
           ListEmptyComponent={
             <Text style={{textAlign: 'center'}}>Liste boş</Text>
@@ -303,11 +372,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 24,
   },
-  buttonText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: '500',
-  },
+
   addButton: {
     // position: 'absolute',
     // bottom: 24,
@@ -356,6 +421,52 @@ const styles = StyleSheet.create({
   },
   defaultStatus: {
     color: 'gray', // Varsayılan gri renk
+  },
+
+  // -------- MENU ---------
+  menuContainer: {
+    alignItems: 'flex-end',
+    marginHorizontal: 16,
+    marginTop: 10,
+  },
+  dropdownButton: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: 'black',
+    borderRadius: 10,
+    paddingVertical: 1,
+    alignSelf: 'center',
+  },
+  dropdownButtonText: {
+    fontSize: 16,
+    color: 'black',
+  },
+  buttonContent: {
+    flexDirection: 'row', // Yatay hizalama
+    alignItems: 'center', // Dikey hizalama
+    justifyContent: 'center', // İçeriği ortalamak için
+  },
+  buttonText: {
+    fontSize: 16,
+    color: 'black',
+    fontWeight: 'bold',
+    marginRight: 8, // İkon ile metin arasına boşluk ekler
+  },
+  menuContent: {
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderRadius: 8,
+    elevation: 5, // Android gölge efekti
+    shadowColor: '#000', // iOS gölge efekti
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    marginTop: 5, // Butonun hemen altından başlasın
+  },
+  menuItemText: {
+    fontSize: 16,
+    fontWeight: '500',
+    paddingVertical: 10,
   },
 });
 
