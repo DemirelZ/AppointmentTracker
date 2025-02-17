@@ -21,6 +21,8 @@ import {useFocusEffect} from '@react-navigation/native';
 const PastAppointmentsScreen = ({navigation}) => {
   const [pastAppointments, setPastAppointments] = useState([]);
 
+  console.log('pastAppointments', pastAppointments);
+
   const loadAppointments = useCallback(async () => {
     try {
       const result = await getPastAppointments();

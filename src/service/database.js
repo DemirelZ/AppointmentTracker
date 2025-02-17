@@ -86,6 +86,8 @@ export const initTables = () => {
                 title TEXT NOT NULL,
                 description TEXT,
                 date DATETIME NOT NULL,
+                payment_status TEXT DEFAULT 'Beklemede',  
+                payment_status_description TEXT, 
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (contact_id) REFERENCES contacts (id)
             )`,
@@ -193,13 +195,63 @@ export const deleteContact = id => {
   });
 };
 
-// Randevu ekleme
-export const addAppointment = (contactId, title, description, date) => {
+// // Randevu ekleme eski
+// export const addAppointment = (contactId, title, description, date) => {
+//   return new Promise((resolve, reject) => {
+//     db.transaction(tx => {
+//       tx.executeSql(
+//         'INSERT INTO appointments (contact_id, title, description, date) VALUES (?, ?, ?, ?)',
+//         [contactId, title, description, date],
+//         (_, result) => {
+//           resolve(result.insertId);
+//         },
+//         (_, error) => {
+//           reject(error);
+//         },
+//       );
+//     });
+//   });
+// };
+
+// // Randevu güncelleme eski
+// export const updateAppointment = (id, contactId, title, description, date) => {
+//   return new Promise((resolve, reject) => {
+//     db.transaction(tx => {
+//       tx.executeSql(
+//         'UPDATE appointments SET contact_id = ?, title = ?, description = ?, date = ? WHERE id = ?',
+//         [contactId, title, description, date, id],
+//         (_, result) => {
+//           resolve(result);
+//         },
+//         (_, error) => {
+//           reject(error);
+//         },
+//       );
+//     });
+//   });
+// };
+
+//Randevu ekleme
+export const addAppointment = (
+  contactId,
+  title,
+  description,
+  date,
+  paymentStatus = 'Beklemede',
+  paymentStatusDescription = null,
+) => {
   return new Promise((resolve, reject) => {
     db.transaction(tx => {
       tx.executeSql(
-        'INSERT INTO appointments (contact_id, title, description, date) VALUES (?, ?, ?, ?)',
-        [contactId, title, description, date],
+        'INSERT INTO appointments (contact_id, title, description, date, payment_status, payment_status_description) VALUES (?, ?, ?, ?, ?, ?)',
+        [
+          contactId,
+          title,
+          description,
+          date,
+          paymentStatus,
+          paymentStatusDescription,
+        ],
         (_, result) => {
           resolve(result.insertId);
         },
@@ -212,12 +264,28 @@ export const addAppointment = (contactId, title, description, date) => {
 };
 
 // Randevu güncelleme
-export const updateAppointment = (id, contactId, title, description, date) => {
+export const updateAppointment = (
+  id,
+  contactId,
+  title,
+  description,
+  date,
+  paymentStatus,
+  paymentStatusDescription,
+) => {
   return new Promise((resolve, reject) => {
     db.transaction(tx => {
       tx.executeSql(
-        'UPDATE appointments SET contact_id = ?, title = ?, description = ?, date = ? WHERE id = ?',
-        [contactId, title, description, date, id],
+        'UPDATE appointments SET contact_id = ?, title = ?, description = ?, date = ?, payment_status = ?, payment_status_description = ? WHERE id = ?',
+        [
+          contactId,
+          title,
+          description,
+          date,
+          paymentStatus,
+          paymentStatusDescription,
+          id,
+        ],
         (_, result) => {
           resolve(result);
         },

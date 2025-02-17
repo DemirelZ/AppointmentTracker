@@ -215,11 +215,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
   },
-  radioOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
+
   paymentStatusContainer: {
     borderWidth: 1, // Çerçeve ekliyoruz
     borderColor: '#ddd', // Çerçevenin rengini belirliyoruz

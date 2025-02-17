@@ -135,46 +135,6 @@ const styles = StyleSheet.create({
   listContainer: {
     padding: 16,
   },
-  /*
-  appointmentItem: {
-    backgroundColor: '#f8f9fa',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 16,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-  },
-  appointmentHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  appointmentTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    flex: 1,
-  },
-  appointmentDate: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 8,
-  },
-  appointmentDescription: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 8,
-  },
-  contactName: {
-    fontSize: 14,
-    color: '#2196F3',
-    fontWeight: '500',
-  }, */
-
   appointmentItem: {
     backgroundColor: '#f0f4f7',
     borderRadius: 15,

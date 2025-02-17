@@ -21,6 +21,7 @@ import {
   getAllContacts,
 } from '../service/database';
 import DateTimePickerModal from '../components/DateTimePickerModal';
+import CustomRadioButton from '../components/CustomRadioButton';
 
 const AddAppointmentScreen = ({navigation, route}) => {
   const editingAppointment = route.params?.appointment;
@@ -42,6 +43,14 @@ const AddAppointmentScreen = ({navigation, route}) => {
     editingAppointment?.contact_id || selectedContactId || null,
   );
   const [showContactModal, setShowContactModal] = useState(false);
+
+  // PAYMENT
+  const [paymentStatus, setPaymentStatus] = useState(
+    editingAppointment?.payment_status || 'Beklemede',
+  );
+  const [paymentDescription, setPaymentDescription] = useState(
+    editingAppointment?.payment_status_description || '',
+  );
 
   useEffect(() => {
     loadContacts();
@@ -88,6 +97,41 @@ const AddAppointmentScreen = ({navigation, route}) => {
     setDate(newDate);
   };
 
+  // eskisi
+  // const handleSave = async () => {
+  //   if (!title.trim()) {
+  //     Alert.alert('Hata', 'Lütfen randevu başlığını giriniz.');
+  //     return;
+  //   }
+
+  //   if (!selectedContact) {
+  //     Alert.alert('Uyarı', 'Lütfen bir kişi seçiniz.');
+  //     return;
+  //   }
+
+  //   try {
+  //     if (editingAppointment) {
+  //       await updateAppointment(
+  //         editingAppointment.id,
+  //         selectedContact,
+  //         title,
+  //         description,
+  //         date.toISOString(),
+  //       );
+  //     } else {
+  //       await addAppointment(
+  //         selectedContact,
+  //         title,
+  //         description,
+  //         date.toISOString(),
+  //       );
+  //     }
+  //     navigation.goBack();
+  //   } catch (error) {
+  //     Alert.alert('Hata', 'Randevu kaydedilirken bir hata oluştu.');
+  //   }
+  // };
+
   const handleSave = async () => {
     if (!title.trim()) {
       Alert.alert('Hata', 'Lütfen randevu başlığını giriniz.');
@@ -107,6 +151,8 @@ const AddAppointmentScreen = ({navigation, route}) => {
           title,
           description,
           date.toISOString(),
+          paymentStatus, // Mevcut ödeme durumu
+          paymentDescription, // Mevcut açıklama
         );
       } else {
         await addAppointment(
@@ -114,6 +160,8 @@ const AddAppointmentScreen = ({navigation, route}) => {
           title,
           description,
           date.toISOString(),
+          paymentStatus, // Varsayılan değer
+          paymentDescription, // Varsayılan değer
         );
       }
       navigation.goBack();
@@ -283,6 +331,32 @@ const AddAppointmentScreen = ({navigation, route}) => {
                 {format(date, 'HH:mm', {locale: tr})}
               </Text>
             </TouchableOpacity>
+
+            {/**------------ PAYMENT---------------- */}
+            <Text style={styles.label}>Payment Status</Text>
+            <View style={styles.paymentStatusContainer}>
+              <View style={styles.radioGroup}>
+                <CustomRadioButton
+                  value="Beklemede"
+                  selectedValue={paymentStatus}
+                  onChange={setPaymentStatus}
+                />
+                <CustomRadioButton
+                  value="Ödendi"
+                  selectedValue={paymentStatus}
+                  onChange={setPaymentStatus}
+                />
+              </View>
+
+              <Text style={styles.label}>Payment Description</Text>
+              <TextInput
+                style={styles.paymentTextarea}
+                value={paymentDescription}
+                onChangeText={setPaymentDescription}
+                placeholder="Payment date, method, status..."
+                multiline
+              />
+            </View>
 
             <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
               <Text style={styles.saveButtonText}>
@@ -474,6 +548,29 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: 'gray',
     marginTop: 4, // İsmin altında biraz boşluk bırakır
+  },
+  paymentStatusContainer: {
+    borderWidth: 1, // Çerçeve ekliyoruz
+    borderColor: '#ddd', // Çerçevenin rengini belirliyoruz
+    borderRadius: 8, // Köşeleri yuvarlatıyoruz
+    padding: 16, // İçeriğe boşluk ekliyoruz
+    backgroundColor: '#f9f9f9', // Arka plan rengini belirliyoruz
+    marginVertical: 0, // Üst ve alt boşluk
+  },
+  radioGroup: {
+    flexDirection: 'row',
+    gap: 30,
+    marginVertical: 10,
+  },
+  paymentTextarea: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    color: '#333',
+    height: 100,
+    textAlignVertical: 'top',
   },
 });
 
