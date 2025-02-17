@@ -65,8 +65,6 @@ export const initTables = () => {
                 name TEXT NOT NULL,
                 phone TEXT,
                 email TEXT,
-                payment_status TEXT DEFAULT 'Beklemede',  
-                payment_status_description TEXT, 
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )`,
         [],
@@ -139,8 +137,8 @@ export const addContact = (
   return new Promise((resolve, reject) => {
     db.transaction(tx => {
       tx.executeSql(
-        'INSERT INTO contacts (name, phone, email, payment_status, payment_status_description) VALUES (?, ?, ?, ?, ?)',
-        [name, phone, email, payment_status, payment_status_description],
+        'INSERT INTO contacts (name, phone, email) VALUES (?, ?, ?)',
+        [name, phone, email],
         (_, result) => {
           resolve(result.insertId);
         },
@@ -153,19 +151,12 @@ export const addContact = (
 };
 
 // Kişi güncelleme
-export const updateContact = (
-  id,
-  name,
-  phone,
-  email,
-  payment_status,
-  payment_status_description,
-) => {
+export const updateContact = (id, name, phone, email) => {
   return new Promise((resolve, reject) => {
     db.transaction(tx => {
       tx.executeSql(
-        'UPDATE contacts SET name = ?, phone = ?, email = ?, payment_status = ?, payment_status_description = ? WHERE id = ?',
-        [name, phone, email, payment_status, payment_status_description, id],
+        'UPDATE contacts SET name = ?, phone = ?, email = ? WHERE id = ?',
+        [name, phone, email, id],
         (_, result) => {
           resolve(result);
         },

@@ -23,46 +23,6 @@ const AddContactScreen = ({navigation, route}) => {
   const [name, setName] = useState(editingContact?.name || '');
   const [phone, setPhone] = useState(editingContact?.phone || '');
   const [email, setEmail] = useState(editingContact?.email || '');
-  const [paymentStatus, setPaymentStatus] = useState(
-    editingContact?.payment_status || 'Beklemede',
-  );
-  const [paymentDescription, setPaymentDescription] = useState(
-    editingContact?.payment_status_description || '',
-  );
-
-  // const handleSave = async () => {
-
-  //   if (!name.trim()) {
-  //     Alert.alert('Hata', 'Lütfen kişi adını giriniz.');
-  //     return;
-  //   }
-
-  //   try {
-  //     let contactId;
-  //     if (editingContact) {
-  //       await updateContact(editingContact.id, name, phone, email);
-  //       contactId = editingContact.id;
-  //     } else {
-  //       contactId = await addContact(name, phone, email);
-  //     }
-
-  //     if (returnToAppointment) {
-  //       // Önce Appointments tab'ına dön ve yeni kişiyi seç
-  //       navigation.navigate('Appointments', {
-  //         screen: 'AddAppointmentScreen',
-  //         params: {
-  //           selectedContactId: contactId,
-  //           selectedContactName: name,
-  //           clearForm: true,
-  //         },
-  //       });
-  //     } else {
-  //       navigation.goBack();
-  //     }
-  //   } catch (error) {
-  //     Alert.alert('Hata', 'Kişi kaydedilirken bir hata oluştu.');
-  //   }
-  // };
 
   const handleSave = async () => {
     if (!name.trim()) {
@@ -73,23 +33,10 @@ const AddContactScreen = ({navigation, route}) => {
     try {
       let contactId;
       if (editingContact) {
-        await updateContact(
-          editingContact.id,
-          name,
-          phone,
-          email,
-          paymentStatus,
-          paymentDescription,
-        );
+        await updateContact(editingContact.id, name, phone, email);
         contactId = editingContact.id;
       } else {
-        contactId = await addContact(
-          name,
-          phone,
-          email,
-          paymentStatus,
-          paymentDescription,
-        );
+        contactId = await addContact(name, phone, email);
       }
 
       if (returnToAppointment) {
@@ -145,33 +92,6 @@ const AddContactScreen = ({navigation, route}) => {
               keyboardType="email-address"
               autoCapitalize="none"
             />
-
-            <Text style={styles.label}>Payment Status</Text>
-            <View style={styles.paymentStatusContainer}>
-              <View style={styles.radioGroup}>
-                <CustomRadioButton
-                  value="Beklemede"
-                  selectedValue={paymentStatus}
-                  onChange={setPaymentStatus}
-                />
-                <CustomRadioButton
-                  value="Ödendi"
-                  selectedValue={paymentStatus}
-                  onChange={setPaymentStatus}
-                />
-              </View>
-
-              <Text style={styles.label}>
-                Payment Description (date, payment, etc.)
-              </Text>
-              <TextInput
-                style={styles.textarea}
-                value={paymentDescription}
-                onChangeText={setPaymentDescription}
-                placeholder="Add a description if needed"
-                multiline
-              />
-            </View>
 
             <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
               <Text style={styles.saveButtonText}>
