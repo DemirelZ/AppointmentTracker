@@ -10,6 +10,7 @@ import {
   Button,
   SafeAreaView,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import {
   getAllContacts,
@@ -24,6 +25,8 @@ const ContactListScreen = ({navigation}) => {
   const [selectedContact, setSelectedContact] = useState(null);
   const [appointments, setAppointments] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   console.log('appointment for modal', appointments);
 
@@ -41,11 +44,16 @@ const ContactListScreen = ({navigation}) => {
   const selectedLocale = localeMap[userLanguage] || enUS;
 
   const loadContacts = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
     try {
       const result = await getAllContacts();
       setContacts(result);
     } catch (error) {
-      Alert.alert('Hata', 'Kişiler yüklenirken bir hata oluştu.');
+      //Alert.alert('Hata', 'Kişiler yüklenirken bir hata oluştu.');
+      setError('Kişiler yüklenirken bir hata oluştu.');
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
@@ -115,18 +123,28 @@ const ContactListScreen = ({navigation}) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <FlatList
-        data={contacts}
-        renderItem={renderItem}
-        keyExtractor={item => item.id.toString()}
-        contentContainerStyle={styles.listContainer}
-        ListEmptyComponent={
-          <View
-            style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-            <Text style={{textAlign: 'center'}}>Liste boş</Text>
-          </View>
-        }
-      />
+      {isLoading && <ActivityIndicator size="large" color="#0000ff" />}
+
+      {error && (
+        <View style={{padding: 10, backgroundColor: 'red', marginBottom: 10}}>
+          <Text style={{color: 'white', textAlign: 'center'}}>{error}</Text>
+        </View>
+      )}
+      {!isLoading && !error && (
+        <FlatList
+          data={contacts}
+          renderItem={renderItem}
+          keyExtractor={item => item.id.toString()}
+          contentContainerStyle={styles.listContainer}
+          ListEmptyComponent={
+            <View
+              style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+              <Text style={{textAlign: 'center'}}>Liste boş</Text>
+            </View>
+          }
+        />
+      )}
+
       <TouchableOpacity
         style={styles.addButton}
         onPress={() => navigation.navigate('AddContactScreen')}>
