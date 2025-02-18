@@ -38,7 +38,7 @@ const AppointmentsStack = () => (
           title: 'Randevular',
           headerRight: () => (
             <Button
-              title="Geçmiş"
+              title="go to archive"
               onPress={() => navigation.navigate('PastAppointmentsScreen')}
             />
           ),
