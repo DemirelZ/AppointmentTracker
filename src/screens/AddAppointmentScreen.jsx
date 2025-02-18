@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState, useEffect, useCallback, useRef} from 'react';
 import {
   View,
   Text,
@@ -51,6 +51,31 @@ const AddAppointmentScreen = ({navigation, route}) => {
   const [paymentDescription, setPaymentDescription] = useState(
     editingAppointment?.payment_status_description || '',
   );
+
+  const [isChanged, setIsChanged] = useState(false);
+  const isChangedRef = useRef(isChanged);
+
+  // Kullanıcı bir input alanını değiştirdiğinde bunu true yap
+  const handleInputChange = setter => text => {
+    console.log('Değişiklik yapıldı:', text);
+    setter(text); // Input değerini güncelle
+    setIsChanged(true); // Kullanıcının değişiklik yaptığını işaretle
+  };
+
+  useEffect(() => {
+    isChangedRef.current = isChanged;
+  }, [isChanged]);
+
+  // Uyarının görünmesini 3 saniye sonra engellemek için
+  useEffect(() => {
+    if (isChanged) {
+      const timer = setTimeout(() => {
+        setIsChanged(false); // 3 saniye sonra isChanged'i false yaparak uyarıyı gizle
+      }, 3000);
+
+      return () => clearTimeout(timer); // Timer'ı temizle
+    }
+  }, [isChanged]);
 
   useEffect(() => {
     loadContacts();
@@ -265,6 +290,14 @@ const AddAppointmentScreen = ({navigation, route}) => {
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{flex: 1}}>
+        {isChanged && editingAppointment && (
+          <View style={styles.changeWarning}>
+            <Text style={styles.changeWarningText}>
+              Lütfen değişiklikleri kaydetmeyi unutmayın!
+            </Text>
+          </View>
+        )}
+
         <ScrollView style={styles.container}>
           <View style={styles.form}>
             <Text style={styles.label}>Kişi</Text>
@@ -300,7 +333,7 @@ const AddAppointmentScreen = ({navigation, route}) => {
             <TextInput
               style={styles.input}
               value={title}
-              onChangeText={setTitle}
+              onChangeText={handleInputChange(setTitle)}
               placeholder="Randevu başlığı"
             />
 
@@ -308,7 +341,7 @@ const AddAppointmentScreen = ({navigation, route}) => {
             <TextInput
               style={[styles.input, styles.textArea]}
               value={description}
-              onChangeText={setDescription}
+              onChangeText={handleInputChange(setDescription)}
               placeholder="Randevu açıklaması"
               multiline
               numberOfLines={4}
@@ -339,12 +372,18 @@ const AddAppointmentScreen = ({navigation, route}) => {
                 <CustomRadioButton
                   value="Beklemede"
                   selectedValue={paymentStatus}
-                  onChange={setPaymentStatus}
+                  onChange={value => {
+                    setPaymentStatus(value); // Seçilen değeri paymentStatus'a aktarır
+                    setIsChanged(true); // Değişiklik olduğunda isChanged'i true yapar
+                  }}
                 />
                 <CustomRadioButton
                   value="Ödendi"
                   selectedValue={paymentStatus}
-                  onChange={setPaymentStatus}
+                  onChange={value => {
+                    setPaymentStatus(value); // Seçilen değeri paymentStatus'a aktarır
+                    setIsChanged(true); // Değişiklik olduğunda isChanged'i true yapar
+                  }}
                 />
               </View>
 
@@ -352,7 +391,7 @@ const AddAppointmentScreen = ({navigation, route}) => {
               <TextInput
                 style={styles.paymentTextarea}
                 value={paymentDescription}
-                onChangeText={setPaymentDescription}
+                onChangeText={handleInputChange(setPaymentDescription)}
                 placeholder="Payment date, method, status..."
                 multiline
               />
@@ -573,6 +612,21 @@ const styles = StyleSheet.create({
     color: '#333',
     height: 100,
     textAlignVertical: 'top',
+  },
+  changeWarning: {
+    position: 'absolute', // Sabit pozisyon
+    top: 6, // Ekranın üst kısmında
+    left: 0,
+    right: 0,
+    backgroundColor: '#FFD300',
+    padding: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 100, // Diğer içeriklerin üstünde
+  },
+  changeWarningText: {
+    fontSize: 16,
+    color: 'black',
   },
 });
 
