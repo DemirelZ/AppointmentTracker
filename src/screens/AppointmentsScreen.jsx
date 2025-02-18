@@ -381,16 +381,24 @@ const styles = StyleSheet.create({
   },
 
   pendingStatus: {
-    color: 'orange', // Sarı tonunda olabilir
-    padding: 5,
-    backgroundColor: 'rgba(255, 255, 0, 0.2)', // Sarı arka plan
+    color: 'orange', // Yazı rengi
+    paddingHorizontal: 10, // Yatay padding
+    paddingVertical: 5, // Dikey padding
+    backgroundColor: 'rgba(255, 255, 0, 0.2)', // Sarı tonlu arka plan
     borderRadius: 50, // Yuvarlak form
+    borderWidth: 1,
+    borderColor: 'orange',
+    alignSelf: 'flex-start', // İçeriğin genişliği kadar olacak
   },
   paidStatus: {
     color: 'green', // Yeşil
-    padding: 5,
+    paddingHorizontal: 10, // Yatay padding
+    paddingVertical: 5,
     backgroundColor: 'rgba(0, 128, 0, 0.2)', // Yeşil arka plan
     borderRadius: 50, // Yuvarlak form
+    borderWidth: 1,
+    borderColor: 'green',
+    alignSelf: 'flex-start',
   },
   defaultStatus: {
     color: 'gray', // Varsayılan gri renk

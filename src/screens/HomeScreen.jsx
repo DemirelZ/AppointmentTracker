@@ -16,7 +16,7 @@ import {
   getWeekAppointmentsCount,
   getMonthAppointmentsCount,
 } from '../service/database';
-import {ArrowLeft2, ArrowRight2, CloudFog} from 'iconsax-react-native';
+import {ArrowLeft2, ArrowRight2} from 'iconsax-react-native';
 
 const HomeScreen = ({navigation}) => {
   const [weekAppointments, setWeekAppointments] = useState([]);
@@ -30,10 +30,6 @@ const HomeScreen = ({navigation}) => {
 
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-
-  console.log('weekAppointments', weekAppointments);
-  console.log('açıldı modal', modalVisible);
-  console.log('aselectedAppointment', selectedAppointment);
 
   const [stats, setStats] = useState({
     today: 0,

@@ -480,11 +480,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'flex-end',
   },
+
   modalContent: {
     backgroundColor: '#fff',
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     paddingTop: 16,
+    paddingBottom: 30,
     maxHeight: '80%',
   },
   modalTitle: {

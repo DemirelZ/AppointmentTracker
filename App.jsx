@@ -30,7 +30,7 @@ import {PaperProvider} from 'react-native-paper';
 
 const AppointmentsStack = () => (
   <PaperProvider>
-    <Stack.Navigator>
+    <Stack.Navigator initialRouteName="AppointmentsList">
       <Stack.Screen
         name="AppointmentsList"
         component={AppointmentsScreen}
@@ -61,7 +61,7 @@ const AppointmentsStack = () => (
 );
 
 const ContactsStack = () => (
-  <Stack.Navigator>
+  <Stack.Navigator initialRouteName="ContactsList">
     <Stack.Screen
       name="ContactsList"
       component={ContactListScreen}
@@ -95,6 +95,7 @@ const App = () => {
               paddingTop: 0,
             },
             safeAreaInsets: {bottom: 20},
+            initialRouteName: 'Home',
           }}>
           <Tab.Screen
             name="Home"
