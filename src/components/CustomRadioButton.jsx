@@ -25,7 +25,7 @@ const CustomRadioButton = ({value, selectedValue, onChange}) => {
               width: 10,
               height: 10,
               borderRadius: 5,
-              backgroundColor: '#808080',
+              backgroundColor: value === 'Beklemede' ? 'orange' : 'green',
             }}
           />
         )}
