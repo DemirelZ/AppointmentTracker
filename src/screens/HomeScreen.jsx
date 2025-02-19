@@ -230,6 +230,9 @@ const HomeScreen = ({navigation}) => {
               <View style={styles.modalContent}>
                 {selectedAppointment ? (
                   <>
+                    <Text style={styles.modalTitleHead}>
+                      Appointment Details
+                    </Text>
                     <Text
                       style={styles.modalTitle}
                       numberOfLines={3}
@@ -447,11 +450,19 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 5,
   },
-  modalTitle: {
+  modalTitleHead: {
     fontSize: 20,
     fontWeight: 'bold',
+    textDecorationLine: 'underline',
     textAlign: 'center',
     marginBottom: 10,
+    color: '#333',
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    textAlign: 'left',
+    marginBottom: 14,
     color: '#333',
   },
   detailContainer: {

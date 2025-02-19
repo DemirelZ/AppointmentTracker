@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback, useRef} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
   Text,
@@ -88,10 +88,14 @@ const AddAppointmentScreen = ({navigation, route}) => {
   }, [navigation]);
 
   useEffect(() => {
-    if (selectedContactId) {
-      setSelectedContact(selectedContactId);
+    // selectedContactId'nin değiştirilme durumunu izleyelim
+    console.log('selectedContact değişti:', selectedContact);
+
+    if (selectedContact !== editingAppointment?.contact_id) {
+      console.log('İletişim değişti, değişiklik algılandı');
+      setIsChanged(true);
     }
-  }, [selectedContactId]);
+  }, [selectedContact]); // selectedContact değiştiğinde çalışacak
 
   useEffect(() => {
     if (shouldClearForm) {
@@ -111,7 +115,16 @@ const AddAppointmentScreen = ({navigation, route}) => {
     }
   };
 
+  //------------ DATE AND TIME SELECT ---------------
+
   const handleDateSelect = selectedDate => {
+    if (
+      editingAppointment &&
+      new Date(selectedDate).getTime() !==
+        new Date(editingAppointment.date).getTime()
+    ) {
+      setIsChanged(true);
+    }
     setDate(selectedDate);
   };
 
@@ -119,43 +132,18 @@ const AddAppointmentScreen = ({navigation, route}) => {
     const newDate = new Date(date);
     newDate.setHours(selectedTime.getHours());
     newDate.setMinutes(selectedTime.getMinutes());
+
+    if (
+      editingAppointment &&
+      newDate.getTime() !== new Date(editingAppointment.date).getTime()
+    ) {
+      setIsChanged(true);
+    }
+
     setDate(newDate);
   };
 
-  // eskisi
-  // const handleSave = async () => {
-  //   if (!title.trim()) {
-  //     Alert.alert('Hata', 'Lütfen randevu başlığını giriniz.');
-  //     return;
-  //   }
-
-  //   if (!selectedContact) {
-  //     Alert.alert('Uyarı', 'Lütfen bir kişi seçiniz.');
-  //     return;
-  //   }
-
-  //   try {
-  //     if (editingAppointment) {
-  //       await updateAppointment(
-  //         editingAppointment.id,
-  //         selectedContact,
-  //         title,
-  //         description,
-  //         date.toISOString(),
-  //       );
-  //     } else {
-  //       await addAppointment(
-  //         selectedContact,
-  //         title,
-  //         description,
-  //         date.toISOString(),
-  //       );
-  //     }
-  //     navigation.goBack();
-  //   } catch (error) {
-  //     Alert.alert('Hata', 'Randevu kaydedilirken bir hata oluştu.');
-  //   }
-  // };
+  // ---------------- HANDLE SAVE -------------------
 
   const handleSave = async () => {
     if (!title.trim()) {
