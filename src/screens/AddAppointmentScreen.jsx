@@ -88,6 +88,12 @@ const AddAppointmentScreen = ({navigation, route}) => {
   }, [navigation]);
 
   useEffect(() => {
+    if (selectedContactId) {
+      setSelectedContact(selectedContactId);
+    }
+  }, [selectedContactId]);
+
+  useEffect(() => {
     // selectedContactId'nin değiştirilme durumunu izleyelim
     console.log('selectedContact değişti:', selectedContact);
 
