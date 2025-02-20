@@ -27,6 +27,7 @@ const Stack = createNativeStackNavigator();
 
 import {Button} from 'react-native';
 import {PaperProvider} from 'react-native-paper';
+import Toast from 'react-native-toast-message';
 
 const AppointmentsStack = () => (
   <PaperProvider>
@@ -144,6 +145,7 @@ const App = () => {
           />
         </Tab.Navigator>
       </NavigationContainer>
+      <Toast />
     </SafeAreaProvider>
   );
 };

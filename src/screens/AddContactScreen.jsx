@@ -13,9 +13,8 @@ import {
   KeyboardAvoidingView,
 } from 'react-native';
 import {addContact, updateContact} from '../service/database';
-import {RadioButton} from 'react-native-paper';
-import CustomRadioButton from '../components/CustomRadioButton';
 import {useFocusEffect} from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
 
 const AddContactScreen = ({navigation, route}) => {
   const editingContact = route?.params?.contact;
@@ -86,6 +85,13 @@ const AddContactScreen = ({navigation, route}) => {
           },
         });
       } else {
+        Toast.show({
+          type: 'success',
+          text1: 'Başarı!',
+          text2: 'Kişi başarıyla eklendi.',
+          position: 'top',
+          topOffset: 90,
+        });
         navigation.goBack();
       }
     } catch (error) {

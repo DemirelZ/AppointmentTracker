@@ -22,6 +22,7 @@ import {
 } from '../service/database';
 import DateTimePickerModal from '../components/DateTimePickerModal';
 import CustomRadioButton from '../components/CustomRadioButton';
+import Toast from 'react-native-toast-message';
 
 const AddAppointmentScreen = ({navigation, route}) => {
   const editingAppointment = route.params?.appointment;
@@ -183,6 +184,13 @@ const AddAppointmentScreen = ({navigation, route}) => {
           paymentDescription, // Varsayılan değer
         );
       }
+      Toast.show({
+        type: 'success',
+        text1: 'Başarı!',
+        text2: 'Kişi başarıyla eklendi.',
+        position: 'top',
+        topOffset: 90,
+      });
       navigation.goBack();
     } catch (error) {
       Alert.alert('Hata', 'Randevu kaydedilirken bir hata oluştu.');

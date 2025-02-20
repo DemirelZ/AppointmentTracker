@@ -17,6 +17,7 @@ import db, {
 } from '../service/database';
 import {Calendar, Edit2, Trash} from 'iconsax-react-native';
 import CustomCheckbox from '../components/CustomCheckbox';
+import Toast from 'react-native-toast-message';
 
 const AppointmentsScreen = ({navigation}) => {
   const [upcomingAppointments, setUpcomingAppointments] = useState([]);
@@ -63,6 +64,12 @@ const AppointmentsScreen = ({navigation}) => {
             try {
               await deleteAppointment(id);
               loadAppointments();
+              Toast.show({
+                type: 'error',
+                text1: 'the appointment was successfully deleted',
+                position: 'top',
+                topOffset: 90, // Mesaj, ekranın üstünden 50 piksel aşağıda görünecek
+              });
             } catch (error) {
               Alert.alert('Hata', 'Randevu silinirken bir hata oluştu.');
             }
