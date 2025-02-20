@@ -79,16 +79,17 @@ export const initTables = () => {
 
       tx.executeSql(
         `CREATE TABLE IF NOT EXISTS appointments (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                contact_id INTEGER,
-                title TEXT NOT NULL,
-                description TEXT,
-                date DATETIME NOT NULL,
-                payment_status TEXT DEFAULT 'Beklemede',  
-                payment_status_description TEXT, 
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (contact_id) REFERENCES contacts (id)
-            )`,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            contact_id INTEGER,
+            title TEXT NOT NULL,
+            description TEXT,
+            date DATETIME NOT NULL,
+            payment_status TEXT DEFAULT 'Beklemede',  
+            payment_status_description TEXT, 
+            completed INTEGER DEFAULT 0, -- Yeni eklenen sütun (0: Not Completed, 1: Completed)
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (contact_id) REFERENCES contacts (id)
+)`,
         [],
         () => {
           console.log('✅ Appointments table created successfully');
@@ -423,6 +424,25 @@ export const deletePastAppointments = () => {
           resolve(result);
         },
         (_, error) => {
+          reject(error);
+        },
+      );
+    });
+  });
+};
+
+export const UpdateAppointmentCompleteStatus = (appointmentId, checked) => {
+  return new Promise((resolve, reject) => {
+    db.transaction(tx => {
+      tx.executeSql(
+        `UPDATE appointments SET completed = ? WHERE id = ?`,
+        [checked ? 1 : 0, appointmentId],
+        (_, result) => {
+          console.log('✅ Appointment status updated successfully');
+          resolve(result);
+        },
+        (_, error) => {
+          console.error('❌ Error updating appointment status:', error);
           reject(error);
         },
       );

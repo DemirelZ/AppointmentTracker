@@ -13,8 +13,10 @@ import {tr} from 'date-fns/locale';
 import db, {
   deleteAppointment,
   getUpcomingAppointments,
+  UpdateAppointmentCompleteStatus,
 } from '../service/database';
 import {Calendar, Edit2, Trash} from 'iconsax-react-native';
+import CustomCheckbox from '../components/CustomCheckbox';
 
 const AppointmentsScreen = ({navigation}) => {
   const [upcomingAppointments, setUpcomingAppointments] = useState([]);
@@ -105,6 +107,21 @@ const AppointmentsScreen = ({navigation}) => {
             ]}>
             Payment: {item.payment_status === 'Beklemede' ? 'Pending' : 'Paid'}
           </Text>
+          <CustomCheckbox
+            checked={item.completed === 1}
+            onToggle={async newState => {
+              await UpdateAppointmentCompleteStatus(item.id, newState);
+
+              // 📌 State'i güncelle ve UI'ı yenile
+              setUpcomingAppointments(prevAppointments =>
+                prevAppointments.map(appointment =>
+                  appointment.id === item.id
+                    ? {...appointment, completed: newState ? 1 : 0}
+                    : appointment,
+                ),
+              );
+            }}
+          />
         </View>
       </View>
       <View style={styles.buttonContainer}>
@@ -212,7 +229,7 @@ const styles = StyleSheet.create({
   appointmentDescription: {
     fontSize: 15,
     color: '#444',
-    marginTop: 8,
+    marginVertical: 8,
   },
   contactName: {
     marginTop: 10,

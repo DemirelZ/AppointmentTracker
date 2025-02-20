@@ -14,10 +14,12 @@ import {
   deleteAppointment,
   deletePastAppointments,
   getPastAppointments,
+  UpdateAppointmentCompleteStatus,
 } from '../service/database';
 import {ArrowDown2, Calendar, Edit2, Trash} from 'iconsax-react-native';
 import {Picker} from '@react-native-picker/picker';
 import {Button, Menu} from 'react-native-paper';
+import CustomCheckbox from '../components/CustomCheckbox';
 
 const PastAppointmentsScreen = ({navigation}) => {
   const [pastAppointments, setPastAppointments] = useState([]);
@@ -44,6 +46,10 @@ const PastAppointmentsScreen = ({navigation}) => {
       setIsLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    filterAppointments(pastAppointments);
+  }, [pastAppointments]);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -156,6 +162,21 @@ const PastAppointmentsScreen = ({navigation}) => {
             ]}>
             Payment: {item.payment_status === 'Beklemede' ? 'Pending' : 'Paid'}
           </Text>
+          <CustomCheckbox
+            checked={item.completed === 1}
+            onToggle={async newState => {
+              await UpdateAppointmentCompleteStatus(item.id, newState);
+
+              setPastAppointments(prevAppointments => {
+                const updatedAppointments = prevAppointments.map(appointment =>
+                  appointment.id === item.id
+                    ? {...appointment, completed: newState ? 1 : 0}
+                    : appointment,
+                );
+                return [...updatedAppointments]; // Yeni referans oluştur
+              });
+            }}
+          />
         </View>
       </View>
       <View style={styles.buttonContainer}>
