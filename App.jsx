@@ -72,6 +72,7 @@ const ContactsStack = () => (
       component={AddContactScreen}
       options={({route}) => ({
         title: route.params?.contact ? 'Kişi Düzenle' : 'Yeni Kişi',
+        unmountOnBlur: true,
       })}
     />
   </Stack.Navigator>

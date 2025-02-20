@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   View,
   Text,
@@ -15,6 +15,7 @@ import {
 import {addContact, updateContact} from '../service/database';
 import {RadioButton} from 'react-native-paper';
 import CustomRadioButton from '../components/CustomRadioButton';
+import {useFocusEffect} from '@react-navigation/native';
 
 const AddContactScreen = ({navigation, route}) => {
   const editingContact = route?.params?.contact;
@@ -26,6 +27,16 @@ const AddContactScreen = ({navigation, route}) => {
 
   const [isChanged, setIsChanged] = useState(false);
   const isChangedRef = useRef(isChanged);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (!editingContact) {
+        setName('');
+        setPhone('');
+        setEmail('');
+      }
+    }, [editingContact]),
+  );
 
   // Kullanıcı bir input alanını değiştirdiğinde bunu true yap
   const handleInputChange = setter => text => {
