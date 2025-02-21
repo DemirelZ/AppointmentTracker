@@ -19,6 +19,7 @@ import {
 } from '../service/database';
 import {format} from 'date-fns';
 import {tr, enUS, fr} from 'date-fns/locale';
+import Toast from 'react-native-toast-message';
 
 const ContactListScreen = ({navigation}) => {
   const [contacts, setContacts] = useState([]);
@@ -85,6 +86,12 @@ const ContactListScreen = ({navigation}) => {
           try {
             await deleteContact(id);
             loadContacts();
+            Toast.show({
+              type: 'error',
+              text1: 'The contact was successfully deleted',
+              position: 'top',
+              topOffset: 90,
+            });
           } catch (error) {
             Alert.alert('Hata', 'Kişi silinirken bir hata oluştu.');
           }

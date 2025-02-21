@@ -66,9 +66,9 @@ const AppointmentsScreen = ({navigation}) => {
               loadAppointments();
               Toast.show({
                 type: 'error',
-                text1: 'the appointment was successfully deleted',
+                text1: 'The appointment was successfully deleted',
                 position: 'top',
-                topOffset: 90, // Mesaj, ekranın üstünden 50 piksel aşağıda görünecek
+                topOffset: 90,
               });
             } catch (error) {
               Alert.alert('Hata', 'Randevu silinirken bir hata oluştu.');

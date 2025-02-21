@@ -87,8 +87,9 @@ const AddContactScreen = ({navigation, route}) => {
       } else {
         Toast.show({
           type: 'success',
-          text1: 'Başarı!',
-          text2: 'Kişi başarıyla eklendi.',
+          text1: editingContact
+            ? 'The contact was successfully updated'
+            : 'The contact was successfully created',
           position: 'top',
           topOffset: 90,
         });

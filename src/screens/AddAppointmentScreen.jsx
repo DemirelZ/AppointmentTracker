@@ -186,8 +186,9 @@ const AddAppointmentScreen = ({navigation, route}) => {
       }
       Toast.show({
         type: 'success',
-        text1: 'Başarı!',
-        text2: 'Kişi başarıyla eklendi.',
+        text1: editingAppointment
+          ? 'The appointment was succesfully updated'
+          : 'The appointment was succesfully created',
         position: 'top',
         topOffset: 90,
       });
