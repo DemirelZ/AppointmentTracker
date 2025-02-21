@@ -20,6 +20,8 @@ import {ArrowDown2, Calendar, Edit2, Trash} from 'iconsax-react-native';
 import {Picker} from '@react-native-picker/picker';
 import {Button, Menu} from 'react-native-paper';
 import CustomCheckbox from '../components/CustomCheckbox';
+import moment from 'moment-timezone';
+import {userTimeZone} from '../../App';
 
 const PastAppointmentsScreen = ({navigation}) => {
   const [pastAppointments, setPastAppointments] = useState([]);
@@ -136,6 +138,10 @@ const PastAppointmentsScreen = ({navigation}) => {
     }
   };
 
+  const convertToUserTimeZone = utcDate => {
+    return moment.utc(utcDate).tz(userTimeZone).toDate(); // Date nesnesi olarak dön
+  };
+
   const renderItem = ({item}) => (
     <View style={styles.appointmentItem}>
       <View style={styles.infoContainer}>
@@ -146,7 +152,7 @@ const PastAppointmentsScreen = ({navigation}) => {
           <View style={styles.dateContainer}>
             <Calendar size={18} color="#888" />
             <Text style={styles.appointmentDate}>
-              {format(new Date(item.date), 'PPP - HH:mm', {locale: tr})}
+              {format(convertToUserTimeZone(item.date), 'PP - h:mm a')}
             </Text>
           </View>
           {item.description && (

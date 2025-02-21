@@ -18,6 +18,8 @@ import db, {
 import {Calendar, Edit2, Trash} from 'iconsax-react-native';
 import CustomCheckbox from '../components/CustomCheckbox';
 import Toast from 'react-native-toast-message';
+import moment from 'moment-timezone';
+import {userTimeZone} from '../../App';
 
 const AppointmentsScreen = ({navigation}) => {
   const [upcomingAppointments, setUpcomingAppointments] = useState([]);
@@ -88,6 +90,10 @@ const AppointmentsScreen = ({navigation}) => {
     return styles.defaultStatus; // Varsayılan stil
   };
 
+  const convertToUserTimeZone = utcDate => {
+    return moment.utc(utcDate).tz(userTimeZone).toDate(); // Date nesnesi olarak dön
+  };
+
   const renderItem = ({item}) => (
     <View style={styles.appointmentItem}>
       <View style={styles.infoContainer}>
@@ -98,7 +104,7 @@ const AppointmentsScreen = ({navigation}) => {
           <View style={styles.dateContainer}>
             <Calendar size={18} color="#888" />
             <Text style={styles.appointmentDate}>
-              {format(new Date(item.date), 'PPP - HH:mm', {locale: tr})}
+              {format(convertToUserTimeZone(item.date), 'PP - h:mm a')}
             </Text>
           </View>
           {item.description && (

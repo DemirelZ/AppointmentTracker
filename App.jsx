@@ -79,6 +79,8 @@ const ContactsStack = () => (
   </Stack.Navigator>
 );
 
+export const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
 const App = () => {
   useEffect(() => {
     //createTables();

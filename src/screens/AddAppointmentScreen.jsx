@@ -23,6 +23,12 @@ import {
 import DateTimePickerModal from '../components/DateTimePickerModal';
 import CustomRadioButton from '../components/CustomRadioButton';
 import Toast from 'react-native-toast-message';
+import moment from 'moment-timezone';
+import {userTimeZone} from '../../App';
+
+const convertToUserTimeZone = utcDate => {
+  return moment.utc(utcDate).tz(userTimeZone).toDate(); // UTC'yi kullanıcının saat dilimine çevir
+};
 
 const AddAppointmentScreen = ({navigation, route}) => {
   const editingAppointment = route.params?.appointment;
@@ -124,31 +130,66 @@ const AddAppointmentScreen = ({navigation, route}) => {
 
   //------------ DATE AND TIME SELECT ---------------
 
+  // Tarihi yerel saat diliminden UTC'ye çevirme fonksiyonu
+  const convertToUTC = localDate => {
+    return moment.tz(localDate, userTimeZone).utc().toDate(); // Kullanıcı saat diliminden UTC'ye
+  };
+
+  // Tarih seçildiğinde yapılacak işlemler
   const handleDateSelect = selectedDate => {
+    const localDate = new Date(selectedDate);
     if (
       editingAppointment &&
-      new Date(selectedDate).getTime() !==
-        new Date(editingAppointment.date).getTime()
+      localDate.getTime() !== new Date(editingAppointment.date).getTime()
     ) {
       setIsChanged(true);
     }
-    setDate(selectedDate);
+    setDate(localDate);
   };
 
+  // Saat seçildiğinde yapılacak işlemler
   const handleTimeSelect = selectedTime => {
     const newDate = new Date(date);
     newDate.setHours(selectedTime.getHours());
     newDate.setMinutes(selectedTime.getMinutes());
 
+    const utcDate = convertToUTC(newDate); // Yeni saati UTC'ye çevir
+
     if (
       editingAppointment &&
-      newDate.getTime() !== new Date(editingAppointment.date).getTime()
+      utcDate.getTime() !== new Date(editingAppointment.date).getTime()
     ) {
       setIsChanged(true);
     }
 
     setDate(newDate);
   };
+
+  // const handleDateSelect = selectedDate => {
+  //   if (
+  //     editingAppointment &&
+  //     new Date(selectedDate).getTime() !==
+  //       new Date(editingAppointment.date).getTime()
+  //   ) {
+  //     setIsChanged(true);
+  //   }
+  //   setDate(selectedDate);
+  // };
+
+  // const handleTimeSelect = selectedTime => {
+  //   const newDate = new Date(date);
+  //   newDate.setHours(selectedTime.getHours());
+  //   newDate.setMinutes(selectedTime.getMinutes());
+
+  //   if (
+  //     editingAppointment &&
+  //     newDate.getTime() !== new Date(editingAppointment.date).getTime()
+  //   ) {
+  //     setIsChanged(true);
+  //   }
+
+  //   setDate(newDate);
+  // };
 
   // ---------------- HANDLE SAVE -------------------
 
@@ -355,7 +396,7 @@ const AddAppointmentScreen = ({navigation, route}) => {
               style={styles.dateButton}
               onPress={() => setShowDatePickerModal(true)}>
               <Text style={styles.dateButtonText}>
-                {format(date, 'PPP', {locale: tr})}
+                {format(convertToUserTimeZone(date), 'PPP')}
               </Text>
             </TouchableOpacity>
 
@@ -364,7 +405,7 @@ const AddAppointmentScreen = ({navigation, route}) => {
               style={styles.dateButton}
               onPress={() => setShowTimePickerModal(true)}>
               <Text style={styles.dateButtonText}>
-                {format(date, 'HH:mm', {locale: tr})}
+                {format(convertToUserTimeZone(date), 'HH:mm')}
               </Text>
             </TouchableOpacity>
 
