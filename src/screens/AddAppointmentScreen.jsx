@@ -391,6 +391,7 @@ const AddAppointmentScreen = ({navigation, route}) => {
               numberOfLines={4}
             />
 
+            {/**--------------- DATE AND TIME ------------------- */}
             <Text style={styles.label}>Tarih</Text>
             <TouchableOpacity
               style={styles.dateButton}
@@ -405,7 +406,7 @@ const AddAppointmentScreen = ({navigation, route}) => {
               style={styles.dateButton}
               onPress={() => setShowTimePickerModal(true)}>
               <Text style={styles.dateButtonText}>
-                {format(convertToUserTimeZone(date), 'HH:mm')}
+                {format(convertToUserTimeZone(date), 'hh:mm a')}
               </Text>
             </TouchableOpacity>
 

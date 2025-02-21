@@ -56,6 +56,12 @@ const DateTimePickerModal = ({
     onClose();
   };
 
+  const formatHourAMPM = hour => {
+    const period = hour < 12 ? 'AM' : 'PM';
+    const formattedHour = hour % 12 === 0 ? 12 : hour % 12; // 0'ı 12 AM, 12'yi 12 PM yap
+    return `${formattedHour} ${period}`;
+  };
+
   // Eski calendar
   // const renderCalendar = () => {
   //   const start = new Date(
@@ -207,7 +213,8 @@ const DateTimePickerModal = ({
                   styles.timeText,
                   selectedHour === hour && styles.selectedTimeText,
                 ]}>
-                {hour.toString().padStart(2, '0')}
+                {/* {hour.toString().padStart(2, '0')} */}
+                {formatHourAMPM(hour)} {/* AM/PM formatına çevrildi */}
               </Text>
             </TouchableOpacity>
           ))}
