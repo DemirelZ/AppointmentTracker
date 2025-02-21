@@ -67,22 +67,25 @@ const PastAppointmentsScreen = ({navigation}) => {
 
   const handleDelete = async id => {
     Alert.alert(
-      'Randevu Sil',
-      'Bu randevuyu silmek istediğinizden emin misiniz?',
+      'Delete Appointment',
+      'Are you sure you want to delete this appointment?',
       [
         {
-          text: 'İptal',
+          text: 'Cancel',
           style: 'cancel',
         },
         {
-          text: 'Sil',
+          text: 'Delete',
           style: 'destructive',
           onPress: async () => {
             try {
               await deleteAppointment(id);
               loadAppointments();
             } catch (error) {
-              Alert.alert('Hata', 'Randevu silinirken bir hata oluştu.');
+              Alert.alert(
+                'Error',
+                'An error occurred while deleting an appointment',
+              );
             }
           },
         },
@@ -92,15 +95,15 @@ const PastAppointmentsScreen = ({navigation}) => {
 
   const handleAllAppointmentsDelete = () => {
     Alert.alert(
-      'Tüm Geçmiş Randevuları Sil',
-      'Tüm geçmiş randevular kalıcı olarak silinecek.\n\nTüm geçmiş randevuları silmek istediğinizden emin misiniz?',
+      'Delete All Past Appointments',
+      'All past appointments will be permanently deleted.\n\nAre you sure you want to delete all past appointments?',
       [
         {
-          text: 'İptal',
+          text: 'Cancel',
           style: 'cancel',
         },
         {
-          text: 'Sil',
+          text: 'Delete',
           style: 'destructive',
           onPress: async () => {
             try {
@@ -108,8 +111,8 @@ const PastAppointmentsScreen = ({navigation}) => {
               loadAppointments(); // Listeyi güncelle
             } catch (error) {
               Alert.alert(
-                'Hata',
-                'Geçmiş randevular silinirken bir hata oluştu.',
+                'Error',
+                'An error occurred while deleting past appointments',
               );
             }
           },
@@ -193,7 +196,7 @@ const PastAppointmentsScreen = ({navigation}) => {
           }>
           <Edit2 size={20} color="#fff" />
           <Text style={styles.editText}>Edit appointment &</Text>
-          <Text style={styles.editText}>payment staus</Text>
+          <Text style={styles.editText}>payment status</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.button, styles.deleteButton]}
@@ -269,7 +272,7 @@ const PastAppointmentsScreen = ({navigation}) => {
           }
           contentContainerStyle={styles.listContainer}
           ListEmptyComponent={
-            <Text style={{textAlign: 'center'}}>Liste boş</Text>
+            <Text style={{textAlign: 'center'}}>List empty</Text>
           }
         />
       )}
@@ -277,7 +280,7 @@ const PastAppointmentsScreen = ({navigation}) => {
         <TouchableOpacity
           style={styles.deleteAllButton}
           onPress={handleAllAppointmentsDelete}>
-          <Text style={styles.addButtonText}>Tüm Geçmiş Randevuları Sil</Text>
+          <Text style={styles.addButtonText}>Delete All Past Appointments</Text>
         </TouchableOpacity>
       </View>
     </View>

@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   Alert,
   Modal,
-  Button,
   SafeAreaView,
   ScrollView,
   ActivityIndicator,
@@ -52,7 +51,7 @@ const ContactListScreen = ({navigation}) => {
       setContacts(result);
     } catch (error) {
       //Alert.alert('Hata', 'Kişiler yüklenirken bir hata oluştu.');
-      setError('Kişiler yüklenirken bir hata oluştu.');
+      setError('An error occurred while loading contacts');
     } finally {
       setIsLoading(false);
     }
@@ -74,30 +73,34 @@ const ContactListScreen = ({navigation}) => {
   };
 
   const handleDelete = async id => {
-    Alert.alert('Kişiyi Sil', 'Bu kişiyi silmek istediğinizden emin misiniz?', [
-      {
-        text: 'İptal',
-        style: 'cancel',
-      },
-      {
-        text: 'Sil',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await deleteContact(id);
-            loadContacts();
-            Toast.show({
-              type: 'error',
-              text1: 'The contact was successfully deleted',
-              position: 'top',
-              topOffset: 90,
-            });
-          } catch (error) {
-            Alert.alert('Hata', 'Kişi silinirken bir hata oluştu.');
-          }
+    Alert.alert(
+      'Delete Contact',
+      'Are you sure you want to delete this contact?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
         },
-      },
-    ]);
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteContact(id);
+              loadContacts();
+              Toast.show({
+                type: 'error',
+                text1: 'The contact was successfully deleted',
+                position: 'top',
+                topOffset: 90,
+              });
+            } catch (error) {
+              Alert.alert('Error', 'An error occurred while deleting contact.');
+            }
+          },
+        },
+      ],
+    );
   };
 
   const renderItem = ({item}) => (
@@ -117,12 +120,12 @@ const ContactListScreen = ({navigation}) => {
               contact: item,
             })
           }>
-          <Text style={styles.buttonText}>Düzenle</Text>
+          <Text style={styles.buttonText}>Edit</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.button, styles.deleteButton]}
           onPress={() => handleDelete(item.id)}>
-          <Text style={styles.buttonText}>Sil</Text>
+          <Text style={styles.buttonText}>Delete</Text>
         </TouchableOpacity>
       </View>
     </TouchableOpacity>
@@ -146,7 +149,9 @@ const ContactListScreen = ({navigation}) => {
           ListEmptyComponent={
             <View
               style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-              <Text style={{textAlign: 'center'}}>Liste boş</Text>
+              <Text style={{textAlign: 'center'}}>
+                No one has been added to the list yet
+              </Text>
             </View>
           }
         />
@@ -155,7 +160,7 @@ const ContactListScreen = ({navigation}) => {
       <TouchableOpacity
         style={styles.addButton}
         onPress={() => navigation.navigate('AddContactScreen')}>
-        <Text style={styles.addButtonText}>+ Yeni Kişi</Text>
+        <Text style={styles.addButtonText}>+ New Contact</Text>
       </TouchableOpacity>
 
       {/* Modal for showing appointments */}
@@ -165,10 +170,10 @@ const ContactListScreen = ({navigation}) => {
             {/* Modal Başlık */}
             <View style={styles.header}>
               <Text style={styles.headerTitle}>
-                {selectedContact?.name} - Randevular
+                {selectedContact?.name} - Appointments
               </Text>
               <Text style={styles.headerSubtitle}>
-                {appointments.length} randevu bulundu
+                {appointments.length} appointments found
               </Text>
             </View>
 
@@ -190,8 +195,7 @@ const ContactListScreen = ({navigation}) => {
                       📅{' '}
                       {format(
                         new Date(item.date),
-                        'dd MMMM yyyy, EEEE - HH:mm',
-                        {locale: tr},
+                        'MM/dd/yyyy, EEEE - hh:mm a',
                       )}
                     </Text>
                   </View>
@@ -199,7 +203,9 @@ const ContactListScreen = ({navigation}) => {
               )}
               ListEmptyComponent={
                 <View style={styles.emptyContainer}>
-                  <Text style={styles.emptyText}>Henüz randevu eklenmedi.</Text>
+                  <Text style={styles.emptyText}>
+                    No appointments have been added yet
+                  </Text>
                 </View>
               }
             />
@@ -208,7 +214,7 @@ const ContactListScreen = ({navigation}) => {
             <TouchableOpacity
               style={styles.closeButton}
               onPress={() => setModalVisible(false)}>
-              <Text style={styles.closeButtonText}>Kapat</Text>
+              <Text style={styles.closeButtonText}>Close</Text>
             </TouchableOpacity>
           </SafeAreaView>
         </View>

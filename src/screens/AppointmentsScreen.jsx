@@ -52,15 +52,15 @@ const AppointmentsScreen = ({navigation}) => {
 
   const handleDelete = async id => {
     Alert.alert(
-      'Randevu Sil',
-      'Bu randevuyu silmek istediğinizden emin misiniz?',
+      'Delete Appointment',
+      'Are you sure you want to delete this appointment?',
       [
         {
-          text: 'İptal',
+          text: 'Cancel',
           style: 'cancel',
         },
         {
-          text: 'Sil',
+          text: 'Delete',
           style: 'destructive',
           onPress: async () => {
             try {
@@ -73,7 +73,10 @@ const AppointmentsScreen = ({navigation}) => {
                 topOffset: 90,
               });
             } catch (error) {
-              Alert.alert('Hata', 'Randevu silinirken bir hata oluştu.');
+              Alert.alert(
+                'Error',
+                'An error occurred while deleting an appointment.',
+              );
             }
           },
         },
@@ -145,7 +148,7 @@ const AppointmentsScreen = ({navigation}) => {
           }>
           <Edit2 size={20} color="#fff" />
           <Text style={styles.editText}>Edit appointment &</Text>
-          <Text style={styles.editText}>payment staus</Text>
+          <Text style={styles.editText}>payment status</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.button, styles.deleteButton]}
@@ -179,7 +182,7 @@ const AppointmentsScreen = ({navigation}) => {
       <TouchableOpacity
         style={styles.addButton}
         onPress={() => navigation.navigate('AddAppointmentScreen')}>
-        <Text style={styles.addButtonText}>+ Yeni Randevu</Text>
+        <Text style={styles.addButtonText}>+ New Appointment</Text>
       </TouchableOpacity>
     </View>
   );

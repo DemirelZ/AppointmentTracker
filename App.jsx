@@ -92,11 +92,13 @@ const App = () => {
       <NavigationContainer>
         <Tab.Navigator
           screenOptions={{
-            tabBarActiveTintColor: '#2196F3',
+            //tabBarActiveTintColor: '#2196F3',
+            tabBarActiveTintColor: '#fff',
             tabBarInactiveTintColor: '#999',
             tabBarStyle: {
               height: 70,
               paddingTop: 0,
+              backgroundColor: '#3064f9',
             },
             safeAreaInsets: {bottom: 20},
             initialRouteName: 'Home',
@@ -105,7 +107,7 @@ const App = () => {
             name="Home"
             component={HomeScreen}
             options={{
-              title: 'Takvim',
+              title: 'Calendar',
               tabBarIcon: ({color, focused}) => (
                 <Calendar
                   size={focused ? 30 : 24}

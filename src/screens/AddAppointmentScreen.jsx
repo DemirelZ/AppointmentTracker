@@ -64,7 +64,6 @@ const AddAppointmentScreen = ({navigation, route}) => {
 
   // Kullanıcı bir input alanını değiştirdiğinde bunu true yap
   const handleInputChange = setter => text => {
-    console.log('Değişiklik yapıldı:', text);
     setter(text); // Input değerini güncelle
     setIsChanged(true); // Kullanıcının değişiklik yaptığını işaretle
   };
@@ -101,14 +100,10 @@ const AddAppointmentScreen = ({navigation, route}) => {
   }, [selectedContactId]);
 
   useEffect(() => {
-    // selectedContactId'nin değiştirilme durumunu izleyelim
-    console.log('selectedContact değişti:', selectedContact);
-
     if (selectedContact !== editingAppointment?.contact_id) {
-      console.log('İletişim değişti, değişiklik algılandı');
       setIsChanged(true);
     }
-  }, [selectedContact]); // selectedContact değiştiğinde çalışacak
+  }, [selectedContact]);
 
   useEffect(() => {
     if (shouldClearForm) {
@@ -124,7 +119,7 @@ const AddAppointmentScreen = ({navigation, route}) => {
       const result = await getAllContacts();
       setContacts(result);
     } catch (error) {
-      Alert.alert('Hata', 'Kişiler yüklenirken bir hata oluştu.');
+      Alert.alert('Error', 'An error occurred while loading contacts.');
     }
   };
 
@@ -195,12 +190,12 @@ const AddAppointmentScreen = ({navigation, route}) => {
 
   const handleSave = async () => {
     if (!title.trim()) {
-      Alert.alert('Hata', 'Lütfen randevu başlığını giriniz.');
+      Alert.alert('Warning', 'Please enter the appointment title');
       return;
     }
 
     if (!selectedContact) {
-      Alert.alert('Uyarı', 'Lütfen bir kişi seçiniz.');
+      Alert.alert('Warning', 'Please select a person');
       return;
     }
 
@@ -235,7 +230,7 @@ const AddAppointmentScreen = ({navigation, route}) => {
       });
       navigation.goBack();
     } catch (error) {
-      Alert.alert('Hata', 'Randevu kaydedilirken bir hata oluştu.');
+      Alert.alert('Error', 'An error occurred while saving the appointment');
     }
   };
 
@@ -263,7 +258,7 @@ const AddAppointmentScreen = ({navigation, route}) => {
       const contact = contacts.find(c => c.id === selectedContact);
       return {
         name: contact?.name || selectedContactName,
-        phone: contact?.phone || 'Numara bulunamadı',
+        phone: contact?.phone || 'Number not found',
       };
     }
     return {name: null, phone: null};
@@ -279,7 +274,7 @@ const AddAppointmentScreen = ({navigation, route}) => {
       onRequestClose={() => setShowContactModal(false)}>
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Kişi Seçimi</Text>
+          <Text style={styles.modalTitle}>Contact Selection</Text>
           <ScrollView style={styles.modalScrollView}>
             {contacts.map(contact => (
               <TouchableOpacity
@@ -313,7 +308,7 @@ const AddAppointmentScreen = ({navigation, route}) => {
               onPress={() => {
                 setShowContactModal(false), setSelectedContact(null);
               }}>
-              <Text style={styles.modalButtonText}>İptal</Text>
+              <Text style={styles.modalButtonText}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.modalButton, styles.addNewButton]}
@@ -321,7 +316,7 @@ const AddAppointmentScreen = ({navigation, route}) => {
                 setShowContactModal(false);
                 handleAddNewContact();
               }}>
-              <Text style={styles.modalButtonText}>Yeni Kişi Ekle</Text>
+              <Text style={styles.modalButtonText}>Add New Contact</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -337,14 +332,14 @@ const AddAppointmentScreen = ({navigation, route}) => {
         {isChanged && editingAppointment && (
           <View style={styles.changeWarning}>
             <Text style={styles.changeWarningText}>
-              Lütfen değişiklikleri kaydetmeyi unutmayın!
+              Please don't forget to save the changes!
             </Text>
           </View>
         )}
 
         <ScrollView style={styles.container}>
           <View style={styles.form}>
-            <Text style={styles.label}>Kişi</Text>
+            <Text style={styles.label}>Contact</Text>
             <View style={styles.contactSelectionContainer}>
               {selectedContact ? (
                 <View style={styles.selectedContactContainer}>
@@ -361,38 +356,40 @@ const AddAppointmentScreen = ({navigation, route}) => {
                   <TouchableOpacity
                     style={styles.changeContactButton}
                     onPress={() => setShowContactModal(true)}>
-                    <Text style={styles.changeContactButtonText}>Değiştir</Text>
+                    <Text style={styles.changeContactButtonText}>Replace</Text>
                   </TouchableOpacity>
                 </View>
               ) : (
                 <TouchableOpacity
                   style={styles.selectContactButton}
                   onPress={() => setShowContactModal(true)}>
-                  <Text style={styles.selectContactButtonText}>Kişi Seç</Text>
+                  <Text style={styles.selectContactButtonText}>
+                    Select Contact
+                  </Text>
                 </TouchableOpacity>
               )}
             </View>
 
-            <Text style={styles.label}>Başlık</Text>
+            <Text style={styles.label}>Title</Text>
             <TextInput
               style={styles.input}
               value={title}
               onChangeText={handleInputChange(setTitle)}
-              placeholder="Randevu başlığı"
+              placeholder="Appointment title"
             />
 
-            <Text style={styles.label}>Açıklama</Text>
+            <Text style={styles.label}>Description</Text>
             <TextInput
               style={[styles.input, styles.textArea]}
               value={description}
               onChangeText={handleInputChange(setDescription)}
-              placeholder="Randevu açıklaması"
+              placeholder="Appointment description"
               multiline
               numberOfLines={4}
             />
 
             {/**--------------- DATE AND TIME ------------------- */}
-            <Text style={styles.label}>Tarih</Text>
+            <Text style={styles.label}>Date</Text>
             <TouchableOpacity
               style={styles.dateButton}
               onPress={() => setShowDatePickerModal(true)}>
@@ -401,7 +398,7 @@ const AddAppointmentScreen = ({navigation, route}) => {
               </Text>
             </TouchableOpacity>
 
-            <Text style={styles.label}>Saat</Text>
+            <Text style={styles.label}>Time</Text>
             <TouchableOpacity
               style={styles.dateButton}
               onPress={() => setShowTimePickerModal(true)}>
@@ -444,7 +441,7 @@ const AddAppointmentScreen = ({navigation, route}) => {
 
             <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
               <Text style={styles.saveButtonText}>
-                {editingAppointment ? 'Güncelle' : 'Kaydet'}
+                {editingAppointment ? 'Update' : 'Save'}
               </Text>
             </TouchableOpacity>
           </View>

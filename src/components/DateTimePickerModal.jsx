@@ -177,7 +177,7 @@ const DateTimePickerModal = ({
       <View style={styles.calendar}>
         {/* Haftanın günleri (Pazartesi ile başlıyor) */}
         <View style={styles.weekDays}>
-          {['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pz'].map((day, index) => (
+          {['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map((day, index) => (
             <Text
               key={index}
               style={[
@@ -198,7 +198,7 @@ const DateTimePickerModal = ({
   const renderTimePicker = () => (
     <View style={styles.timePickerContainer}>
       <View style={styles.timeColumn}>
-        <Text style={styles.timeColumnHeader}>Saat</Text>
+        <Text style={styles.timeColumnHeader}>Hour</Text>
         <ScrollView showsVerticalScrollIndicator={false}>
           {HOURS.map(hour => (
             <TouchableOpacity
@@ -221,7 +221,7 @@ const DateTimePickerModal = ({
         </ScrollView>
       </View>
       <View style={styles.timeColumn}>
-        <Text style={styles.timeColumnHeader}>Dakika</Text>
+        <Text style={styles.timeColumnHeader}>Min</Text>
         <ScrollView showsVerticalScrollIndicator={false}>
           {MINUTES.map(minute => (
             <TouchableOpacity
@@ -265,7 +265,7 @@ const DateTimePickerModal = ({
                     <Text style={styles.headerButtonText}>←</Text>
                   </TouchableOpacity>
                   <Text style={styles.headerTitle}>
-                    {format(currentMonth, 'MMMM yyyy', {locale: tr})}
+                    {format(currentMonth, 'MMMM yyyy')}
                   </Text>
                   <TouchableOpacity
                     style={styles.headerButton}
@@ -279,20 +279,20 @@ const DateTimePickerModal = ({
           ) : (
             <>
               <View style={styles.header}>
-                <Text style={styles.headerTitle}>Saat Seçin</Text>
+                <Text style={styles.headerTitle}>Select Time</Text>
               </View>
               {renderTimePicker()}
             </>
           )}
           <View style={styles.footer}>
             <TouchableOpacity style={styles.footerButton} onPress={onClose}>
-              <Text style={styles.footerButtonText}>İptal</Text>
+              <Text style={styles.footerButtonText}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.footerButton, styles.confirmButton]}
               onPress={handleConfirm}>
               <Text style={[styles.footerButtonText, styles.confirmButtonText]}>
-                Tamam
+                Select
               </Text>
             </TouchableOpacity>
           </View>

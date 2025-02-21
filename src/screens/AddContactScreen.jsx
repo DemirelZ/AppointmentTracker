@@ -39,7 +39,6 @@ const AddContactScreen = ({navigation, route}) => {
 
   // Kullanıcı bir input alanını değiştirdiğinde bunu true yap
   const handleInputChange = setter => text => {
-    console.log('Değişiklik yapıldı:', text);
     setter(text); // Input değerini güncelle
     setIsChanged(true); // Kullanıcının değişiklik yaptığını işaretle
   };
@@ -61,7 +60,7 @@ const AddContactScreen = ({navigation, route}) => {
 
   const handleSave = async () => {
     if (!name.trim()) {
-      Alert.alert('Hata', 'Lütfen kişi adını giriniz.');
+      Alert.alert('Warning', 'Please enter the contact name');
       return;
     }
 
@@ -96,7 +95,7 @@ const AddContactScreen = ({navigation, route}) => {
         navigation.goBack();
       }
     } catch (error) {
-      Alert.alert('Hata', 'Kişi kaydedilirken bir hata oluştu.');
+      Alert.alert('Error', 'An error occurred while saving the contact');
     }
   };
 
@@ -109,7 +108,7 @@ const AddContactScreen = ({navigation, route}) => {
         {isChanged && editingContact && (
           <View style={styles.changeWarning}>
             <Text style={styles.changeWarningText}>
-              Lütfen değişiklikleri kaydetmeyi unutmayın!
+              Please remember to save the changes!
             </Text>
           </View>
         )}
@@ -118,36 +117,36 @@ const AddContactScreen = ({navigation, route}) => {
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}>
           <View style={styles.form}>
-            <Text style={styles.label}>Ad Soyad *</Text>
+            <Text style={styles.label}>Name Surname *</Text>
             <TextInput
               style={styles.input}
               value={name}
               onChangeText={handleInputChange(setName)}
-              placeholder="Ad Soyad"
+              placeholder="Name Surname"
             />
 
-            <Text style={styles.label}>Telefon</Text>
+            <Text style={styles.label}>Phone</Text>
             <TextInput
               style={styles.input}
               value={phone}
               onChangeText={handleInputChange(setPhone)}
-              placeholder="Telefon numarası"
+              placeholder="Phone number"
               keyboardType="phone-pad"
             />
 
-            <Text style={styles.label}>E-posta</Text>
+            <Text style={styles.label}>E-mail</Text>
             <TextInput
               style={styles.input}
               value={email}
               onChangeText={handleInputChange(setEmail)}
-              placeholder="E-posta adresi"
+              placeholder="E-mail address"
               keyboardType="email-address"
               autoCapitalize="none"
             />
 
             <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
               <Text style={styles.saveButtonText}>
-                {editingContact ? 'Güncelle' : 'Kaydet'}
+                {editingContact ? 'Update' : 'Save'}
               </Text>
             </TouchableOpacity>
           </View>
