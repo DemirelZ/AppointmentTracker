@@ -1,11 +1,5 @@
 import React, {useCallback, useEffect} from 'react';
-import {
-  CommonActions,
-  NavigationContainer,
-  StackActions,
-  useFocusEffect,
-  useNavigation,
-} from '@react-navigation/native';
+import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
@@ -25,22 +19,51 @@ import {initTables} from './src/service/database';
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-import {Button} from 'react-native';
+import {
+  Button,
+  Dimensions,
+  Platform,
+  StatusBar,
+  StyleSheet,
+  View,
+} from 'react-native';
 import {PaperProvider} from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 
+// Cihaz ekran genişliği
+const screenWidth = Dimensions.get('window').width;
+
+// Sekme başına düşen genişlik
+const tabWidth = screenWidth / 3; // 3 sekme olduğu için bölüyoruz
+
+// Dinamik `top` hesaplama
+const tabBarHeight = 70; // tabBarStyle.height değeri ile aynı olmalı
+const iconSize = 30; // İkonun aktifkenki boyutu
+const activeIndicatorHeight = 3; // Çizginin yüksekliği
+
+// Dinamik top değeri
+const dynamicTop = -iconSize / 2 - activeIndicatorHeight / 2 + 11;
+
 const AppointmentsStack = () => (
   <PaperProvider>
-    <Stack.Navigator initialRouteName="AppointmentsList">
+    <Stack.Navigator
+      initialRouteName="AppointmentsList"
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: 'rgb(44, 83, 192)',
+        },
+        headerTintColor: '#fff',
+      }}>
       <Stack.Screen
         name="AppointmentsList"
         component={AppointmentsScreen}
         options={({navigation}) => ({
-          title: 'Randevular',
+          title: 'Appointments',
           headerRight: () => (
             <Button
-              title="go to archive"
+              title="Go to Archive >"
               onPress={() => navigation.navigate('PastAppointmentsScreen')}
+              color={Platform.OS === 'ios' ? 'white' : 'rgb(44, 83, 192)'}
             />
           ),
         })}
@@ -49,30 +72,39 @@ const AppointmentsStack = () => (
         name="AddAppointmentScreen"
         component={AddAppointmentScreen}
         options={({route}) => ({
-          title: route.params?.appointment ? 'Randevu Düzenle' : 'Yeni Randevu',
+          title: route.params?.appointment
+            ? 'Edit Appointment'
+            : 'New Appointment',
         })}
       />
       <Stack.Screen
         name="PastAppointmentsScreen"
         component={PastAppointmentsScreen}
-        options={{title: 'Geçmiş Randevular'}}
+        options={{title: 'Past Appointments'}}
       />
     </Stack.Navigator>
   </PaperProvider>
 );
 
 const ContactsStack = () => (
-  <Stack.Navigator initialRouteName="ContactsList">
+  <Stack.Navigator
+    initialRouteName="ContactsList"
+    screenOptions={{
+      headerStyle: {
+        backgroundColor: 'rgb(44, 83, 192)',
+      },
+      headerTintColor: '#fff',
+    }}>
     <Stack.Screen
       name="ContactsList"
       component={ContactListScreen}
-      options={{title: 'Kişiler'}}
+      options={{title: 'Contacts'}}
     />
     <Stack.Screen
       name="AddContactScreen"
       component={AddContactScreen}
       options={({route}) => ({
-        title: route.params?.contact ? 'Kişi Düzenle' : 'Yeni Kişi',
+        title: route.params?.contact ? 'Edit Contact' : 'New Contact',
         unmountOnBlur: true,
       })}
     />
@@ -87,6 +119,13 @@ const App = () => {
     initTables();
   }, []);
 
+  useEffect(() => {
+    StatusBar.setBarStyle('light-content');
+    if (Platform.OS === 'android') {
+      StatusBar.setBackgroundColor('rgb(44, 83, 192)');
+    }
+  }, []);
+
   return (
     <SafeAreaProvider>
       <NavigationContainer>
@@ -98,7 +137,13 @@ const App = () => {
             tabBarStyle: {
               height: 70,
               paddingTop: 0,
-              backgroundColor: '#3064f9',
+              //backgroundColor: '#3064f9',
+              backgroundColor: 'rgb(44, 83, 192)',
+            },
+            tabBarItemStyle: {
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
             },
             safeAreaInsets: {bottom: 20},
             initialRouteName: 'Home',
@@ -108,12 +153,19 @@ const App = () => {
             component={HomeScreen}
             options={{
               title: 'Calendar',
+              headerStyle: {
+                backgroundColor: 'rgb(44, 83, 192)',
+              },
+              headerTintColor: '#fff',
               tabBarIcon: ({color, focused}) => (
-                <Calendar
-                  size={focused ? 30 : 24}
-                  color={color}
-                  variant={focused ? 'Bold' : 'Outline'}
-                />
+                <View style={styles.iconContainer}>
+                  {focused && <View style={styles.activeIndicator} />}
+                  <Calendar
+                    size={focused ? 30 : 24}
+                    color={color}
+                    variant={focused ? 'Bold' : 'Outline'}
+                  />
+                </View>
               ),
             }}
           />
@@ -122,12 +174,19 @@ const App = () => {
             component={AppointmentsStack}
             options={{
               headerShown: false,
+              headerStyle: {
+                backgroundColor: 'rgb(44, 83, 192)',
+              },
+              headerTintColor: '#fff',
               tabBarIcon: ({color, focused}) => (
-                <AddSquare
-                  size={focused ? 30 : 24}
-                  color={color}
-                  variant={focused ? 'Bold' : 'Outline'}
-                />
+                <View style={styles.iconContainer}>
+                  {focused && <View style={styles.activeIndicator} />}
+                  <AddSquare
+                    size={focused ? 30 : 24}
+                    color={color}
+                    variant={focused ? 'Bold' : 'Outline'}
+                  />
+                </View>
               ),
             }}
           />
@@ -137,12 +196,19 @@ const App = () => {
             component={ContactsStack}
             options={{
               headerShown: false,
+              headerStyle: {
+                backgroundColor: 'rgb(44, 83, 192)',
+              },
+              headerTintColor: '#fff',
               tabBarIcon: ({color, focused}) => (
-                <Personalcard
-                  size={focused ? 30 : 24}
-                  color={color}
-                  variant={focused ? 'Bold' : 'Outline'}
-                />
+                <View style={styles.iconContainer}>
+                  {focused && <View style={styles.activeIndicator} />}
+                  <Personalcard
+                    size={focused ? 30 : 24}
+                    color={color}
+                    variant={focused ? 'Bold' : 'Outline'}
+                  />
+                </View>
               ),
               unmountOnBlur: true,
             }}
@@ -155,3 +221,32 @@ const App = () => {
 };
 
 export default App;
+
+const styles = StyleSheet.create({
+  iconContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  activeIndicator: {
+    position: 'absolute',
+    top: dynamicTop,
+    width: tabWidth,
+    height: activeIndicatorHeight,
+    backgroundColor: '#fff',
+    borderRadius: 2,
+  },
+  customButton: {
+    backgroundColor: 'red',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+});

@@ -59,7 +59,7 @@ const HomeScreen = ({navigation}) => {
       );
       setWeekAppointments(appointments);
     } catch (error) {
-      Alert.alert('Hata', 'Randevular yüklenirken bir hata oluştu.');
+      Alert.alert('Error', 'An error occurred while loading appointments.');
     }
   }, [startDate]);
 
@@ -103,15 +103,15 @@ const HomeScreen = ({navigation}) => {
   const renderStats = () => (
     <View style={styles.statsContainer}>
       <View style={styles.statBox}>
-        <Text style={styles.statLabel}>Bugün</Text>
+        <Text style={styles.statLabel}>Today</Text>
         <Text style={styles.statValue}>{stats.today}</Text>
       </View>
       <View style={[styles.statBox, styles.statBoxMiddle]}>
-        <Text style={styles.statLabel}>Bu Hafta</Text>
+        <Text style={styles.statLabel}>This Week</Text>
         <Text style={styles.statValue}>{stats.week}</Text>
       </View>
       <View style={styles.statBox}>
-        <Text style={styles.statLabel}>Bu Ay</Text>
+        <Text style={styles.statLabel}>This Month</Text>
         <Text style={styles.statValue}>{stats.month}</Text>
       </View>
     </View>
@@ -131,8 +131,8 @@ const HomeScreen = ({navigation}) => {
         style={[styles.dayContainer, isWeekend && styles.weekendDayContainer]}
         key={date.toISOString()}>
         <Text style={[styles.dayHeader, isCurrentDay && styles.todayHeader]}>
-          {format(date, 'EEEE, d MMMM', {locale: tr})}
-          {isCurrentDay && <Text style={styles.todayBadge}> • Bugün</Text>}
+          {format(date, 'EEEE, d MMMM')}
+          {isCurrentDay && <Text style={styles.todayBadge}> • Today</Text>}
         </Text>
         <View
           style={[
@@ -167,7 +167,7 @@ const HomeScreen = ({navigation}) => {
               </TouchableOpacity>
             ))
           ) : (
-            <Text style={styles.noAppointment}>Randevu yok</Text>
+            <Text style={styles.noAppointment}>No appointment</Text>
           )}
         </View>
       </View>
@@ -196,13 +196,13 @@ const HomeScreen = ({navigation}) => {
           style={styles.headerButton}>
           <View style={styles.prevWeek}>
             <ArrowLeft2 size="22" color="#666" />
-            <Text style={styles.headerButtonText}>Önceki Hafta</Text>
+            <Text style={styles.headerButtonText}>Previous Week</Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={goToToday}
           style={[styles.headerButton, styles.todayButton]}>
-          <Text style={styles.todayButtonText}>Bu Hafta</Text>
+          <Text style={styles.todayButtonText}>This Week</Text>
         </TouchableOpacity>
         {/* <TouchableOpacity
           onPress={() => setStartDate(addDays(startDate, 7))}
@@ -213,7 +213,7 @@ const HomeScreen = ({navigation}) => {
           onPress={() => setStartDate(addDays(startDate, 7))}
           style={styles.headerButton}>
           <View style={styles.afterWeek}>
-            <Text style={styles.headerButtonText}>Sonraki Hafta</Text>
+            <Text style={styles.headerButtonText}>Next Week</Text>
             <ArrowRight2 size="22" color="#666" />
           </View>
         </TouchableOpacity>
@@ -241,28 +241,28 @@ const HomeScreen = ({navigation}) => {
                     </Text>
 
                     <View style={styles.detailContainer}>
-                      <Text style={styles.modalLabel}>Saat:</Text>
+                      <Text style={styles.modalLabel}>Time:</Text>
                       <Text style={styles.modalValue}>
                         {format(new Date(selectedAppointment.date), 'HH:mm')}
                       </Text>
                     </View>
 
                     <View style={styles.detailContainer}>
-                      <Text style={styles.modalLabel}>İletişim:</Text>
+                      <Text style={styles.modalLabel}>Contact:</Text>
                       <Text style={styles.modalValue}>
                         {selectedAppointment.contact_name}
                       </Text>
                     </View>
 
                     <View style={styles.detailContainer}>
-                      <Text style={styles.modalLabel}>Telefon:</Text>
+                      <Text style={styles.modalLabel}>Phone:</Text>
                       <Text style={styles.modalValue}>
                         {selectedAppointment.contact_phone}
                       </Text>
                     </View>
 
                     <View style={styles.descriptionContainer}>
-                      <Text style={styles.modalLabel}>Açıklama:</Text>
+                      <Text style={styles.modalLabel}>Description:</Text>
                       <ScrollView style={styles.scrollView}>
                         <Text style={styles.modalDescription}>
                           {selectedAppointment.description}
@@ -273,11 +273,11 @@ const HomeScreen = ({navigation}) => {
                     <TouchableOpacity
                       onPress={() => setModalVisible(false)}
                       style={styles.closeButton}>
-                      <Text style={styles.closeButtonText}>Kapat</Text>
+                      <Text style={styles.closeButtonText}>Close</Text>
                     </TouchableOpacity>
                   </>
                 ) : (
-                  <Text style={styles.loadingText}>Yükleniyor...</Text>
+                  <Text style={styles.loadingText}>Loading...</Text>
                 )}
               </View>
             </View>
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
   headerButton: {
-    padding: 8,
+    padding: 6,
     borderRadius: 4,
   },
   headerButtonText: {
@@ -391,7 +391,7 @@ const styles = StyleSheet.create({
   statBox: {
     flex: 1,
     backgroundColor: '#f8f9fa',
-    padding: 4,
+    padding: 3,
     borderRadius: 6,
     alignItems: 'center',
   },

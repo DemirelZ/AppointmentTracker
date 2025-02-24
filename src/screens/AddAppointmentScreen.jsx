@@ -343,7 +343,7 @@ const AddAppointmentScreen = ({navigation, route}) => {
             <View style={styles.contactSelectionContainer}>
               {selectedContact ? (
                 <View style={styles.selectedContactContainer}>
-                  <View>
+                  <View style={{flex: 1}}>
                     <Text style={styles.selectedContactText}>
                       {selectedContactDetails.name}
                     </Text>
@@ -353,11 +353,13 @@ const AddAppointmentScreen = ({navigation, route}) => {
                       </Text>
                     )}
                   </View>
-                  <TouchableOpacity
-                    style={styles.changeContactButton}
-                    onPress={() => setShowContactModal(true)}>
-                    <Text style={styles.changeContactButtonText}>Replace</Text>
-                  </TouchableOpacity>
+                  <View>
+                    <TouchableOpacity
+                      style={styles.changeContactButton}
+                      onPress={() => setShowContactModal(true)}>
+                      <Text style={styles.changeContactButtonText}>Change</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               ) : (
                 <TouchableOpacity
