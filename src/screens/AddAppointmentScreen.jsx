@@ -53,7 +53,7 @@ const AddAppointmentScreen = ({navigation, route}) => {
 
   // PAYMENT
   const [paymentStatus, setPaymentStatus] = useState(
-    editingAppointment?.payment_status || 'Beklemede',
+    editingAppointment?.payment_status || 'Pending',
   );
   const [paymentDescription, setPaymentDescription] = useState(
     editingAppointment?.payment_status_description || '',
@@ -414,7 +414,7 @@ const AddAppointmentScreen = ({navigation, route}) => {
             <View style={styles.paymentStatusContainer}>
               <View style={styles.radioGroup}>
                 <CustomRadioButton
-                  value="Beklemede"
+                  value="Pending"
                   selectedValue={paymentStatus}
                   onChange={value => {
                     setPaymentStatus(value); // Seçilen değeri paymentStatus'a aktarır
@@ -422,7 +422,7 @@ const AddAppointmentScreen = ({navigation, route}) => {
                   }}
                 />
                 <CustomRadioButton
-                  value="Ödendi"
+                  value="Paid"
                   selectedValue={paymentStatus}
                   onChange={value => {
                     setPaymentStatus(value); // Seçilen değeri paymentStatus'a aktarır

@@ -85,9 +85,9 @@ const AppointmentsScreen = ({navigation}) => {
   };
 
   const getPaymentStatusStyle = status => {
-    if (status === 'Beklemede') {
+    if (status === 'Pending') {
       return styles.pendingStatus; // Sarı daire için stil
-    } else if (status === 'Ödendi') {
+    } else if (status === 'Paid') {
       return styles.paidStatus; // Yeşil daire için stil
     }
     return styles.defaultStatus; // Varsayılan stil
@@ -121,7 +121,7 @@ const AppointmentsScreen = ({navigation}) => {
               styles.appointmentDescription,
               getPaymentStatusStyle(item.payment_status),
             ]}>
-            Payment: {item.payment_status === 'Beklemede' ? 'Pending' : 'Paid'}
+            Payment: {item.payment_status === 'Pending' ? 'Pending' : 'Paid'}
           </Text>
           <CustomCheckbox
             checked={item.completed === 1}

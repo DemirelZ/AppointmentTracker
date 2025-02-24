@@ -161,7 +161,7 @@ const App = () => {
                 <View style={styles.iconContainer}>
                   {focused && <View style={styles.activeIndicator} />}
                   <Calendar
-                    size={focused ? 30 : 24}
+                    size={focused ? 32 : 24}
                     color={color}
                     variant={focused ? 'Bold' : 'Outline'}
                   />
@@ -182,7 +182,7 @@ const App = () => {
                 <View style={styles.iconContainer}>
                   {focused && <View style={styles.activeIndicator} />}
                   <AddSquare
-                    size={focused ? 30 : 24}
+                    size={focused ? 32 : 24}
                     color={color}
                     variant={focused ? 'Bold' : 'Outline'}
                   />
@@ -204,7 +204,7 @@ const App = () => {
                 <View style={styles.iconContainer}>
                   {focused && <View style={styles.activeIndicator} />}
                   <Personalcard
-                    size={focused ? 30 : 24}
+                    size={focused ? 32 : 24}
                     color={color}
                     variant={focused ? 'Bold' : 'Outline'}
                   />
@@ -234,7 +234,8 @@ const styles = StyleSheet.create({
     width: tabWidth,
     height: activeIndicatorHeight,
     backgroundColor: '#fff',
-    borderRadius: 2,
+    borderRadius: 10,
+    alignSelf: 'center',
   },
   customButton: {
     backgroundColor: 'red',

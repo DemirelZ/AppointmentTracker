@@ -84,7 +84,7 @@ export const initTables = () => {
             title TEXT NOT NULL,
             description TEXT,
             date DATETIME NOT NULL,
-            payment_status TEXT DEFAULT 'Beklemede',  
+            payment_status TEXT DEFAULT 'Pending',  
             payment_status_description TEXT, 
             completed INTEGER DEFAULT 0, -- Yeni eklenen sütun (0: Not Completed, 1: Completed)
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -229,7 +229,7 @@ export const addAppointment = (
   title,
   description,
   date,
-  paymentStatus = 'Beklemede',
+  paymentStatus = 'Pending',
   paymentStatusDescription = null,
 ) => {
   return new Promise((resolve, reject) => {

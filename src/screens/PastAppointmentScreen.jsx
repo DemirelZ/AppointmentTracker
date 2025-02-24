@@ -28,7 +28,7 @@ const PastAppointmentsScreen = ({navigation}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const [selectedFilter, setSelectedFilter] = useState('Tümü');
+  const [selectedFilter, setSelectedFilter] = useState('All');
   const [filteredAppointments, setFilteredAppointments] = useState([]);
   const [menuVisible, setMenuVisible] = useState(false);
 
@@ -122,16 +122,16 @@ const PastAppointmentsScreen = ({navigation}) => {
   };
 
   const getPaymentStatusStyle = status => {
-    if (status === 'Beklemede') {
+    if (status === 'Pending') {
       return styles.pendingStatus; // Sarı daire için stil
-    } else if (status === 'Ödendi') {
+    } else if (status === 'Paid') {
       return styles.paidStatus; // Yeşil daire için stil
     }
     return styles.defaultStatus; // Varsayılan stil
   };
 
   const filterAppointments = (appointments = pastAppointments) => {
-    if (selectedFilter === 'Tümü') {
+    if (selectedFilter === 'All') {
       setFilteredAppointments(appointments);
     } else {
       const filtered = appointments.filter(
@@ -169,7 +169,7 @@ const PastAppointmentsScreen = ({navigation}) => {
               styles.appointmentDescription,
               getPaymentStatusStyle(item.payment_status),
             ]}>
-            Payment: {item.payment_status === 'Beklemede' ? 'Pending' : 'Paid'}
+            Payment: {item.payment_status === 'Pending' ? 'Pending' : 'Paid'}
           </Text>
           <CustomCheckbox
             checked={item.completed === 1}
@@ -230,26 +230,26 @@ const PastAppointmentsScreen = ({navigation}) => {
           contentStyle={styles.menuContent}>
           <Menu.Item
             onPress={() => {
-              setSelectedFilter('Tümü');
+              setSelectedFilter('All');
               setMenuVisible(false);
             }}
-            title="Tümü"
+            title="All"
             titleStyle={styles.menuItemText}
           />
           <Menu.Item
             onPress={() => {
-              setSelectedFilter('Ödendi');
+              setSelectedFilter('Paid');
               setMenuVisible(false);
             }}
-            title="Ödendi"
+            title="Paid"
             titleStyle={styles.menuItemText}
           />
           <Menu.Item
             onPress={() => {
-              setSelectedFilter('Beklemede');
+              setSelectedFilter('Pending');
               setMenuVisible(false);
             }}
-            title="Beklemede"
+            title="Pending"
             titleStyle={styles.menuItemText}
           />
         </Menu>

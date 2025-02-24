@@ -6,7 +6,7 @@ const CustomRadioButton = ({value, selectedValue, onChange}) => {
       onPress={() => onChange(value)}
       style={[
         {flexDirection: 'row', alignItems: 'center'},
-        value === 'Beklemede' ? styles.pendingStatus : styles.paidStatus,
+        value === 'Pending' ? styles.pendingStatus : styles.paidStatus,
       ]}>
       <View
         style={{
@@ -14,7 +14,7 @@ const CustomRadioButton = ({value, selectedValue, onChange}) => {
           height: 20,
           borderRadius: 10,
           borderWidth: 2,
-          borderColor: value == 'Beklemede' ? 'orange' : 'green',
+          borderColor: value == 'Pending' ? 'orange' : 'green',
           marginRight: 8,
           justifyContent: 'center',
           alignItems: 'center',
@@ -25,12 +25,12 @@ const CustomRadioButton = ({value, selectedValue, onChange}) => {
               width: 10,
               height: 10,
               borderRadius: 5,
-              backgroundColor: value === 'Beklemede' ? 'orange' : 'green',
+              backgroundColor: value === 'Pending' ? 'orange' : 'green',
             }}
           />
         )}
       </View>
-      <Text style={{color: value === 'Beklemede' ? 'orange' : 'green'}}>
+      <Text style={{color: value === 'Pending' ? 'orange' : 'green'}}>
         {value}
       </Text>
     </TouchableOpacity>
