@@ -19,7 +19,7 @@ import Toast from 'react-native-toast-message';
 const AddContactScreen = ({navigation, route}) => {
   const editingContact = route?.params?.contact;
   console.log('editingContact', editingContact);
-  const returnToAppointment = route?.params?.returnToAppointment;
+  const {returnToAppointment} = route?.params || {};
   const [name, setName] = useState(editingContact?.name || '');
   const [phone, setPhone] = useState(editingContact?.phone || '');
   const [email, setEmail] = useState(editingContact?.email || '');
@@ -73,15 +73,34 @@ const AddContactScreen = ({navigation, route}) => {
         contactId = await addContact(name, phone, email);
       }
 
+      // if (returnToAppointment) {
+      //   // Önce Appointments tab'ına dön ve yeni kişiyi seç
+      //   navigation.navigate('Appointments', {
+      //     screen: 'AddAppointmentScreen',
+      //     params: {
+      //       selectedContactId: contactId,
+      //       selectedContactName: name,
+      //       clearForm: true,
+      //     },
+      //   });
+      // } else {
+      //   Toast.show({
+      //     type: 'success',
+      //     text1: editingContact
+      //       ? 'The contact was successfully updated'
+      //       : 'The contact was successfully created',
+      //     visibilityTime: 2000,
+      //     position: 'top',
+      //     topOffset: 90,
+      //   });
+      //   navigation.goBack();
+      // }
+
       if (returnToAppointment) {
-        // Önce Appointments tab'ına dön ve yeni kişiyi seç
-        navigation.navigate('Appointments', {
-          screen: 'AddAppointmentScreen',
-          params: {
-            selectedContactId: contactId,
-            selectedContactName: name,
-            clearForm: true,
-          },
+        navigation.navigate('AddAppointmentScreen', {
+          selectedContactId: contactId,
+          selectedContactName: name,
+          clearForm: true,
         });
       } else {
         Toast.show({
@@ -89,6 +108,7 @@ const AddContactScreen = ({navigation, route}) => {
           text1: editingContact
             ? 'The contact was successfully updated'
             : 'The contact was successfully created',
+          visibilityTime: 2000,
           position: 'top',
           topOffset: 90,
         });

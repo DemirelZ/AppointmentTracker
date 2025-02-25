@@ -91,6 +91,7 @@ const ContactListScreen = ({navigation}) => {
               Toast.show({
                 type: 'error',
                 text1: 'The contact was successfully deleted',
+                visibilityTime: 1000,
                 position: 'top',
                 topOffset: 90,
               });
@@ -274,7 +275,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#578FCA',
   },
   deleteButton: {
-    backgroundColor: '#f44336',
+    //backgroundColor: '#f44336',
+    backgroundColor: '#D84040',
   },
   buttonText: {
     color: '#fff',

@@ -25,9 +25,10 @@ import CustomRadioButton from '../components/CustomRadioButton';
 import Toast from 'react-native-toast-message';
 import moment from 'moment-timezone';
 import {userTimeZone} from '../../App';
+import AppointmentsScreen from './AppointmentsScreen';
 
 const convertToUserTimeZone = utcDate => {
-  return moment.utc(utcDate).tz(userTimeZone).toDate(); // UTC'yi kullanıcının saat dilimine çevir
+  return moment.utc(utcDate).tz(userTimeZone).toDate();
 };
 
 const AddAppointmentScreen = ({navigation, route}) => {
@@ -225,23 +226,33 @@ const AddAppointmentScreen = ({navigation, route}) => {
         text1: editingAppointment
           ? 'The appointment was succesfully updated'
           : 'The appointment was succesfully created',
+        visibilityTime: 2000,
         position: 'top',
         topOffset: 90,
       });
-      navigation.goBack();
+      navigation.navigate('TabNavigation', {
+        screen: 'Appointments',
+      });
     } catch (error) {
       Alert.alert('Error', 'An error occurred while saving the appointment');
     }
   };
 
+  // const handleAddNewContact = () => {
+  //   setShowContactModal(false);
+  //   navigation.navigate('Contacts', {
+  //     screen: 'AddContactScreen',
+  //     params: {
+  //       returnToAppointment: true,
+  //     },
+  //     initial: false,
+  //   });
+  // };
+
   const handleAddNewContact = () => {
     setShowContactModal(false);
-    navigation.navigate('Contacts', {
-      screen: 'AddContactScreen',
-      params: {
-        returnToAppointment: true,
-      },
-      initial: false,
+    navigation.navigate('AddContactScreen', {
+      returnToAppointment: true,
     });
   };
 
@@ -395,9 +406,7 @@ const AddAppointmentScreen = ({navigation, route}) => {
             <TouchableOpacity
               style={styles.dateButton}
               onPress={() => setShowDatePickerModal(true)}>
-              <Text style={styles.dateButtonText}>
-                {format(convertToUserTimeZone(date), 'PPP')}
-              </Text>
+              <Text style={styles.dateButtonText}>{format(date, 'PPP')}</Text>
             </TouchableOpacity>
 
             <Text style={styles.label}>Time</Text>
@@ -405,7 +414,7 @@ const AddAppointmentScreen = ({navigation, route}) => {
               style={styles.dateButton}
               onPress={() => setShowTimePickerModal(true)}>
               <Text style={styles.dateButtonText}>
-                {format(convertToUserTimeZone(date), 'hh:mm a')}
+                {format(date, 'hh:mm a')}
               </Text>
             </TouchableOpacity>
 

@@ -142,7 +142,7 @@ const PastAppointmentsScreen = ({navigation}) => {
   };
 
   const convertToUserTimeZone = utcDate => {
-    return moment.utc(utcDate).tz(userTimeZone).toDate(); // Date nesnesi olarak dön
+    return moment.utc(utcDate).tz(userTimeZone).toDate(); // Date nesnesi olarak dönç
   };
 
   const renderItem = ({item}) => (
@@ -155,7 +155,7 @@ const PastAppointmentsScreen = ({navigation}) => {
           <View style={styles.dateContainer}>
             <Calendar size={18} color="#888" />
             <Text style={styles.appointmentDate}>
-              {format(convertToUserTimeZone(item.date), 'PP - h:mm a')}
+              {format(new Date(item.date), 'PP - h:mm a')}
             </Text>
           </View>
           {item.description && (
@@ -391,7 +391,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   deleteButton: {
-    backgroundColor: '#f44336',
+    backgroundColor: '#D84040',
     alignItems: 'center',
   },
   deleteAllButton: {

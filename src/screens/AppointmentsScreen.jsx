@@ -69,6 +69,7 @@ const AppointmentsScreen = ({navigation}) => {
               Toast.show({
                 type: 'error',
                 text1: 'The appointment was successfully deleted',
+                visibilityTime: 1000,
                 position: 'top',
                 topOffset: 90,
               });
@@ -107,7 +108,7 @@ const AppointmentsScreen = ({navigation}) => {
           <View style={styles.dateContainer}>
             <Calendar size={18} color="#888" />
             <Text style={styles.appointmentDate}>
-              {format(convertToUserTimeZone(item.date), 'PP - h:mm a')}
+              {format(new Date(item.date), 'PP - h:mm a')}
             </Text>
           </View>
           {item.description && (
@@ -176,6 +177,14 @@ const AppointmentsScreen = ({navigation}) => {
           renderItem={renderItem}
           keyExtractor={item => item.id.toString()}
           contentContainerStyle={styles.listContainer}
+          ListEmptyComponent={
+            <View
+              style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+              <Text style={{textAlign: 'center'}}>
+                No appointment has been added to the list yet
+              </Text>
+            </View>
+          }
         />
       )}
 
@@ -284,7 +293,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   deleteButton: {
-    backgroundColor: '#f44336',
+    backgroundColor: '#D84040',
     alignItems: 'center',
   },
   paymentButton: {
