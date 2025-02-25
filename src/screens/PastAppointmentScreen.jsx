@@ -381,7 +381,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   editButton: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#578FCA',
     alignItems: 'center',
     marginBottom: 20,
   },

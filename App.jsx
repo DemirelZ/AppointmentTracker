@@ -50,7 +50,7 @@ const AppointmentsStack = () => (
       initialRouteName="AppointmentsList"
       screenOptions={{
         headerStyle: {
-          backgroundColor: 'rgb(44, 83, 192)',
+          backgroundColor: '#3674B5',
         },
         headerTintColor: '#fff',
       }}>
@@ -63,7 +63,7 @@ const AppointmentsStack = () => (
             <Button
               title="Go to Archive >"
               onPress={() => navigation.navigate('PastAppointmentsScreen')}
-              color={Platform.OS === 'ios' ? 'white' : 'rgb(44, 83, 192)'}
+              color={Platform.OS === 'ios' ? 'white' : '#3674B5'}
             />
           ),
         })}
@@ -91,7 +91,7 @@ const ContactsStack = () => (
     initialRouteName="ContactsList"
     screenOptions={{
       headerStyle: {
-        backgroundColor: 'rgb(44, 83, 192)',
+        backgroundColor: '#3674B5',
       },
       headerTintColor: '#fff',
     }}>
@@ -122,7 +122,7 @@ const App = () => {
   useEffect(() => {
     StatusBar.setBarStyle('light-content');
     if (Platform.OS === 'android') {
-      StatusBar.setBackgroundColor('rgb(44, 83, 192)');
+      StatusBar.setBackgroundColor('#3674B5');
     }
   }, []);
 
@@ -138,7 +138,7 @@ const App = () => {
               height: 70,
               paddingTop: 0,
               //backgroundColor: '#3064f9',
-              backgroundColor: 'rgb(44, 83, 192)',
+              backgroundColor: '#3674B5',
             },
             tabBarItemStyle: {
               flex: 1,
@@ -154,7 +154,7 @@ const App = () => {
             options={{
               title: 'Calendar',
               headerStyle: {
-                backgroundColor: 'rgb(44, 83, 192)',
+                backgroundColor: '#3674B5',
               },
               headerTintColor: '#fff',
               tabBarIcon: ({color, focused}) => (
@@ -175,7 +175,7 @@ const App = () => {
             options={{
               headerShown: false,
               headerStyle: {
-                backgroundColor: 'rgb(44, 83, 192)',
+                backgroundColor: '#3674B5',
               },
               headerTintColor: '#fff',
               tabBarIcon: ({color, focused}) => (
@@ -197,7 +197,7 @@ const App = () => {
             options={{
               headerShown: false,
               headerStyle: {
-                backgroundColor: 'rgb(44, 83, 192)',
+                backgroundColor: '#3674B5',
               },
               headerTintColor: '#fff',
               tabBarIcon: ({color, focused}) => (

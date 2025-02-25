@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
   },
   todayButton: {
     // backgroundColor: '#2196F3',
-    backgroundColor: 'rgb(44, 83, 192)',
+    backgroundColor: '#3674B5',
     paddingHorizontal: 16,
     paddingVertical: 8,
     alignItems: 'center',

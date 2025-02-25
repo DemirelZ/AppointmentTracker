@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   editButton: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#578FCA',
   },
   deleteButton: {
     backgroundColor: '#f44336',
@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
     color: '#999',
   },
   closeButton: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#578FCA',
     padding: 12,
     borderRadius: 10,
     alignItems: 'center',

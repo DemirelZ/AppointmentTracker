@@ -515,7 +515,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   changeContactButton: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#578FCA',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 4,
