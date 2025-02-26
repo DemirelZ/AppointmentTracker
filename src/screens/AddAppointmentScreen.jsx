@@ -336,7 +336,7 @@ const AddAppointmentScreen = ({navigation, route}) => {
   );
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{flex: 1}}>
@@ -348,7 +348,10 @@ const AddAppointmentScreen = ({navigation, route}) => {
           </View>
         )}
 
-        <ScrollView style={styles.container}>
+        <ScrollView
+          style={styles.container}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{flexGrow: 1, paddingBottom: 80}}>
           <View style={styles.form}>
             <Text style={styles.label}>Contact</Text>
             <View style={styles.contactSelectionContainer}>
@@ -560,7 +563,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
-    marginTop: 24,
+    marginVertical: 24,
   },
   saveButtonText: {
     color: '#fff',

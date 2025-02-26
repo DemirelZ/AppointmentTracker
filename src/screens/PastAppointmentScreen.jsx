@@ -396,7 +396,8 @@ const styles = StyleSheet.create({
   },
   deleteAllButton: {
     backgroundColor: '#f44336',
-    marginVertical: 5,
+    marginTop: 5,
+    marginBottom: 24,
     marginHorizontal: 5,
     paddingHorizontal: 20,
     paddingVertical: 12,

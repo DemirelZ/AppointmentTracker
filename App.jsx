@@ -4,7 +4,12 @@ import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {PaperProvider} from 'react-native-paper';
 
 // Database
-import {initTables} from './src/service/database';
+import {
+  getMonthAppointmentsCount,
+  getTodayAppointmentsCount,
+  getWeekAppointmentsCount,
+  initTables,
+} from './src/service/database';
 
 import {Platform, StatusBar} from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -12,8 +17,14 @@ import RootNavigation from './src/routes/rootNavigation';
 
 const App = () => {
   useEffect(() => {
-    //createTables();
-    initTables();
+    initTables()
+      .then(() => {
+        console.log('✅ Tables initialized, now fetching data...');
+        getTodayAppointmentsCount();
+        getWeekAppointmentsCount();
+        getMonthAppointmentsCount();
+      })
+      .catch(error => console.error('❌ Table initialization error:', error));
   }, []);
 
   return (
