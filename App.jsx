@@ -1,10 +1,10 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {PaperProvider} from 'react-native-paper';
-
+import SQLite from 'react-native-sqlite-storage';
 // Database
-import {
+import db, {
   getMonthAppointmentsCount,
   getTodayAppointmentsCount,
   getWeekAppointmentsCount,
@@ -17,6 +17,7 @@ import RootNavigation from './src/routes/rootNavigation';
 import BootSplash from 'react-native-bootsplash';
 
 const App = () => {
+  const [dbReady, setDbReady] = useState(false);
   // useEffect(() => {
   //   initTables()
   //     .then(() => {
@@ -29,28 +30,39 @@ const App = () => {
   // }, []);
 
   useEffect(() => {
-    const init = async () => {
-      try {
-        await initTables();
-        console.log('✅ Tables initialized, now fetching data...');
+    const openDatabase = () => {
+      db; // Burada db zaten database.js dosyasından import edilmiş
+      setDbReady(true); // Veritabanı hazır olduğunda bu state'i true yapıyoruz
+    };
 
-        // Verileri çek
-        await Promise.all([
-          getTodayAppointmentsCount(),
-          getWeekAppointmentsCount(),
-          getMonthAppointmentsCount(),
-        ]);
-      } catch (error) {
-        console.error('❌ Table initialization error:', error);
-      } finally {
-        // BootSplash'ı gizle
-        await BootSplash.hide({fade: true});
-        console.log('BootSplash has been hidden successfully');
+    openDatabase();
+  }, []);
+
+  useEffect(() => {
+    const init = async () => {
+      if (dbReady) {
+        try {
+          await initTables();
+          console.log('✅ Tables initialized, now fetching data...');
+
+          // Verileri çek
+          await Promise.all([
+            getTodayAppointmentsCount(),
+            getWeekAppointmentsCount(),
+            getMonthAppointmentsCount(),
+          ]);
+        } catch (error) {
+          console.error('❌ Table initialization error:', error);
+        } finally {
+          // BootSplash'ı gizle
+          await BootSplash.hide({fade: true});
+          console.log('BootSplash has been hidden successfully');
+        }
       }
     };
 
     init();
-  }, []);
+  }, [dbReady]);
 
   return (
     <SafeAreaProvider>

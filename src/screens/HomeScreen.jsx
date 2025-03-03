@@ -123,6 +123,8 @@ const HomeScreen = ({navigation}) => {
         format(new Date(app.date), 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd'),
     );
 
+    console.log('dayappointments', dayAppointments);
+
     const isCurrentDay = isToday(date);
     const isWeekend = date.getDay() === 0 || date.getDay() === 6;
 
@@ -154,7 +156,7 @@ const HomeScreen = ({navigation}) => {
                   setModalVisible(true); // Modal'ı aç
                 }}>
                 <Text style={styles.appointmentTime}>
-                  {format(new Date(appointment.date), 'HH:mm')}
+                  {format(new Date(appointment.date), 'hh:mm a')}
                 </Text>
                 <View style={styles.appointmentDetails}>
                   <Text style={styles.appointmentTitle}>
@@ -243,7 +245,7 @@ const HomeScreen = ({navigation}) => {
                     <View style={styles.detailContainer}>
                       <Text style={styles.modalLabel}>Time:</Text>
                       <Text style={styles.modalValue}>
-                        {format(new Date(selectedAppointment.date), 'HH:mm')}
+                        {format(new Date(selectedAppointment.date), 'hh:mm a')}
                       </Text>
                     </View>
 

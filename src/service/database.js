@@ -1,4 +1,5 @@
 import SQLite from 'react-native-sqlite-storage';
+import {format, startOfDay, endOfDay} from 'date-fns';
 
 const db = SQLite.openDatabase(
   {
@@ -93,33 +94,10 @@ export const initTables = () => {
         [],
         () => {
           console.log('✅ Appointments table created successfully');
-          resolve(true);
+          resolve();
         },
         (_, error) => {
           console.error('❌ Error creating appointments table:', error);
-          reject(error);
-        },
-      );
-
-      tx.executeSql(
-        `CREATE TABLE IF NOT EXISTS payments (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            appointment_id INTEGER,  -- Hangi randevuyla ilişkili olduğunu belirtir
-            contact_id INTEGER,      -- Kişinin ID'si
-            amount DECIMAL(10, 2),   -- Ödeme tutarı
-            payment_status TEXT DEFAULT 'Beklemede',  -- Ödeme durumu (Ödendi, Beklemede, İptal Edildi vb.)
-            payment_method TEXT,     -- Ödeme yöntemi (Kredi Kartı, Nakit vb.)
-            payment_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (appointment_id) REFERENCES appointments (id),
-            FOREIGN KEY (contact_id) REFERENCES contacts (id)
-        )`,
-        [],
-        () => {
-          console.log('✅ Payments table created successfully');
-        },
-        (_, error) => {
-          console.error('❌ Error creating payments table:', error);
           reject(error);
         },
       );
@@ -128,13 +106,7 @@ export const initTables = () => {
 };
 
 // Kişi ekleme
-export const addContact = (
-  name,
-  phone,
-  email,
-  payment_status,
-  payment_status_description,
-) => {
+export const addContact = (name, phone, email) => {
   return new Promise((resolve, reject) => {
     db.transaction(tx => {
       tx.executeSql(
@@ -532,29 +504,163 @@ export const getAppointmentsByDateRange = async (startDate, endDate) => {
     );
 
     db.transaction(tx => {
+      // 🛠️ Appointments tablosunun var olup olmadığını kontrol et ve yoksa oluştur
       tx.executeSql(
-        `SELECT appointments.*, 
-                contacts.name AS contact_name, 
-                contacts.phone AS contact_phone 
-         FROM appointments 
-         LEFT JOIN contacts ON appointments.contact_id = contacts.id 
-         WHERE date >= ? AND date <= ?
-         ORDER BY date ASC, appointments.created_at DESC`,
-        [start.toISOString(), end.toISOString()],
+        `CREATE TABLE IF NOT EXISTS appointments (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            contact_id INTEGER,
+            title TEXT NOT NULL,
+            description TEXT,
+            date DATETIME NOT NULL,
+            payment_status TEXT DEFAULT 'Pending',
+            payment_status_description TEXT,
+            completed INTEGER DEFAULT 0,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (contact_id) REFERENCES contacts (id)
+        )`,
+        [],
+        () =>
+          console.log('✅ Appointments tablosu kontrol edildi / oluşturuldu'),
+        (_, error) =>
+          console.error('❌ Appointments tablo oluşturma hatası:', error),
+      );
+
+      // 📊 Appointment tablosundaki veri sayısını kontrol et
+      tx.executeSql(
+        'SELECT COUNT(*) as count FROM appointments',
+        [],
         (_, result) => {
-          console.log('✅ SQL Sorgu Başarılı:', result.rows.raw());
-          resolve(result.rows.raw());
+          if (result.rows.length > 0) {
+            const count = result.rows.item(0).count;
+            console.log('📊 Tablodaki Randevu Sayısı:', count);
+
+            if (count === 0) {
+              //console.warn('⚠️ Hiç randevu bulunamadı.');
+              resolve([]); // Eğer randevu yoksa boş bir dizi döndür
+              return;
+            }
+
+            // Eğer randevu varsa, verileri sorgula
+            tx.executeSql(
+              `SELECT appointments.*,
+                      contacts.name AS contact_name,
+                      contacts.phone AS contact_phone
+               FROM appointments
+               LEFT JOIN contacts ON appointments.contact_id = contacts.id
+               WHERE date >= ? AND date <= ?
+               ORDER BY date ASC, appointments.created_at DESC`,
+              [start.toISOString(), end.toISOString()],
+              (_, result) => {
+                console.log('✅ SQL Sorgu Başarılı:', result.rows.raw());
+                resolve(result.rows.raw());
+              },
+              (_, error) => {
+                console.error('❌ SQL Hatası:', error);
+                reject(
+                  new Error(
+                    'SQL sorgusu başarısız oldu: ' + JSON.stringify(error),
+                  ),
+                );
+              },
+            );
+          }
         },
         (_, error) => {
           console.error('❌ SQL Hatası:', error);
           reject(
-            new Error('SQL sorgusu başarısız oldu: ' + JSON.stringify(error)),
+            new Error('Veri sayısı sorgulama hatası: ' + JSON.stringify(error)),
           );
         },
       );
     });
   });
 };
+
+//Şimdilik sen dur
+// export const getAppointmentsByDateRange = async (startDate, endDate) => {
+//   return new Promise((resolve, reject) => {
+//     const start = format(
+//       startOfDay(new Date(startDate)),
+//       'yyyy-MM-dd HH:mm:ss',
+//     );
+//     const end = format(endOfDay(new Date(endDate)), 'yyyy-MM-dd HH:mm:ss');
+
+//     console.log('📅 SQL Query Tarih Aralığı:', start, end);
+
+//     db.transaction(tx => {
+//       // 🛠️ Önce tablonun var olup olmadığını kontrol et ve yoksa oluştur
+//       tx.executeSql(
+//         `CREATE TABLE IF NOT EXISTS appointments (
+//             id INTEGER PRIMARY KEY AUTOINCREMENT,
+//             contact_id INTEGER,
+//             title TEXT NOT NULL,
+//             description TEXT,
+//             date DATETIME NOT NULL,
+//             payment_status TEXT DEFAULT 'Pending',
+//             payment_status_description TEXT,
+//             completed INTEGER DEFAULT 0,
+//             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+//             FOREIGN KEY (contact_id) REFERENCES contacts (id)
+//         )`,
+//         [],
+//         () =>
+//           console.log('✅ Appointments tablosu kontrol edildi / oluşturuldu'),
+//         (_, error) =>
+//           console.error('❌ Appointments tablo oluşturma hatası:', error),
+//       );
+
+//       // 📊 Appointment tablosundaki veri sayısını kontrol et
+//       tx.executeSql(
+//         'SELECT COUNT(*) as count FROM appointments',
+//         [],
+//         (_, result) => {
+//           if (result.rows.length > 0) {
+//             const count = result.rows.item(0).count;
+//             console.log('📊 Tablodaki Randevu Sayısı:', count);
+
+//             if (count === 0) {
+//               //console.warn('⚠️ Hiç randevu bulunamadı.');
+//               resolve([]); // Eğer randevu yoksa boş bir dizi döndür
+//               return;
+//             }
+//           }
+
+//           // 🔍 Tarih Aralığı Sorgusu (Eğer randevular varsa)
+//           tx.executeSql(
+//             `SELECT appointments.*,
+//                     contacts.name AS contact_name,
+//                     contacts.phone AS contact_phone
+//              FROM appointments
+//              LEFT JOIN contacts ON appointments.contact_id = contacts.id
+//              WHERE date >= ? AND date <= ?
+//              ORDER BY date ASC, appointments.created_at DESC`,
+//             [start, end],
+//             (_, result) => {
+//               console.log('✅ SQL Sorgu Başarılı:', result.rows.raw());
+//               resolve(result.rows.raw());
+//             },
+//             (_, error) => {
+//               console.error('❌ SQL Hatası:', JSON.stringify(error));
+//               console.error(
+//                 '📌 SQL Query:',
+//                 `date >= '${start}' AND date <= '${end}'`,
+//               );
+//               reject(
+//                 new Error(
+//                   'SQL sorgusu başarısız oldu: ' + JSON.stringify(error),
+//                 ),
+//               );
+//             },
+//           );
+//         },
+//         (_, error) => {
+//           console.error('❌ SQL Sayım Hatası:', JSON.stringify(error));
+//           reject(new Error('Tablo kontrolü sırasında hata oluştu.'));
+//         },
+//       );
+//     });
+//   });
+// };
 
 // // Bugünün randevu sayısını getirme
 // export const getTodayAppointmentsCount = () => {
