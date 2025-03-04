@@ -9,7 +9,6 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {format} from 'date-fns';
-import {tr} from 'date-fns/locale';
 import {
   deleteAppointment,
   deletePastAppointments,
@@ -17,11 +16,8 @@ import {
   UpdateAppointmentCompleteStatus,
 } from '../service/database';
 import {ArrowDown2, Calendar, Edit2, Trash} from 'iconsax-react-native';
-import {Picker} from '@react-native-picker/picker';
 import {Button, Menu} from 'react-native-paper';
 import CustomCheckbox from '../components/CustomCheckbox';
-import moment from 'moment-timezone';
-import {userTimeZone} from '../../App';
 
 const PastAppointmentsScreen = ({navigation}) => {
   const [pastAppointments, setPastAppointments] = useState([]);
@@ -42,7 +38,6 @@ const PastAppointmentsScreen = ({navigation}) => {
       setPastAppointments(result);
       filterAppointments(result);
     } catch (error) {
-      //Alert.alert('Hata', 'Randevular yüklenirken bir hata oluştu.');
       setError('Randevular yüklenirken bir hata oluştu.');
     } finally {
       setIsLoading(false);
@@ -123,11 +118,11 @@ const PastAppointmentsScreen = ({navigation}) => {
 
   const getPaymentStatusStyle = status => {
     if (status === 'Pending') {
-      return styles.pendingStatus; // Sarı daire için stil
+      return styles.pendingStatus;
     } else if (status === 'Paid') {
-      return styles.paidStatus; // Yeşil daire için stil
+      return styles.paidStatus;
     }
-    return styles.defaultStatus; // Varsayılan stil
+    return styles.defaultStatus;
   };
 
   const filterAppointments = (appointments = pastAppointments) => {
@@ -141,10 +136,6 @@ const PastAppointmentsScreen = ({navigation}) => {
     }
   };
 
-  const convertToUserTimeZone = utcDate => {
-    return moment.utc(utcDate).tz(userTimeZone).toDate(); // Date nesnesi olarak dönç
-  };
-
   const renderItem = ({item}) => (
     <View style={styles.appointmentItem}>
       <View style={styles.infoContainer}>
@@ -153,23 +144,25 @@ const PastAppointmentsScreen = ({navigation}) => {
         </View>
         <View style={styles.appointmentDetails}>
           <View style={styles.dateContainer}>
-            <Calendar size={18} color="#888" />
             <Text style={styles.appointmentDate}>
-              {format(new Date(item.date), 'PP - h:mm a')}
+              📅 {format(new Date(item.date), 'PP - h:mm a')}
             </Text>
           </View>
           {item.description && (
             <Text style={styles.appointmentDescription}>
-              {item.description}
+              🗒️ {item.description}
             </Text>
           )}
-          <Text style={styles.appointmentContactName}>{item.contact_name}</Text>
+          <Text style={styles.appointmentContactName}>
+            👤 {item.contact_name}
+          </Text>
           <Text
             style={[
               styles.appointmentDescription,
               getPaymentStatusStyle(item.payment_status),
             ]}>
-            Payment: {item.payment_status === 'Pending' ? 'Pending' : 'Paid'}
+            Payment:{' '}
+            {item.payment_status === 'Pending' ? '⌛ Pending' : '✅ Paid'}
           </Text>
           <CustomCheckbox
             checked={item.completed === 1}
@@ -195,14 +188,14 @@ const PastAppointmentsScreen = ({navigation}) => {
             navigation.navigate('AddAppointmentScreen', {appointment: item})
           }>
           <Edit2 size={20} color="#fff" />
-          <Text style={styles.editText}>Edit appointment &</Text>
+          <Text style={styles.editText}>Edit appointment & </Text>
           <Text style={styles.editText}>payment status</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.button, styles.deleteButton]}
           onPress={() => handleDelete(item.id)}>
           <Trash size={20} color="#fff" />
-          <Text style={styles.editText}>Delete appointment</Text>
+          <Text style={styles.editText}> Delete</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -272,7 +265,9 @@ const PastAppointmentsScreen = ({navigation}) => {
           }
           contentContainerStyle={styles.listContainer}
           ListEmptyComponent={
-            <Text style={{textAlign: 'center'}}>List empty</Text>
+            <Text style={{textAlign: 'center'}}>
+              There are no appointments to view in the archive yet
+            </Text>
           }
         />
       )}
@@ -297,7 +292,7 @@ const styles = StyleSheet.create({
   },
 
   appointmentItem: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     backgroundColor: '#f0f4f7',
     borderWidth: 1.5,
     borderColor: '#f44336',
@@ -326,7 +321,6 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
   },
 
   appointmentDetails: {
@@ -340,7 +334,6 @@ const styles = StyleSheet.create({
   appointmentDate: {
     fontSize: 14,
     color: '#666',
-    marginLeft: 5,
   },
   appointmentDescription: {
     fontSize: 15,
@@ -350,7 +343,7 @@ const styles = StyleSheet.create({
   contactName: {
     marginTop: 10,
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: '700',
     color: '#333',
   },
   countdownContainer: {
@@ -375,15 +368,17 @@ const styles = StyleSheet.create({
     bottom: 4,
   },
   button: {
-    paddingHorizontal: 12,
+    flexDirection: 'row',
+    paddingHorizontal: 8,
     paddingVertical: 6,
     borderRadius: 4,
+    marginTop: 16,
     marginLeft: 8,
   },
   editButton: {
+    flex: 1,
     backgroundColor: '#578FCA',
     alignItems: 'center',
-    marginBottom: 20,
   },
   editText: {
     color: '#fff',
@@ -393,6 +388,7 @@ const styles = StyleSheet.create({
   deleteButton: {
     backgroundColor: '#D84040',
     alignItems: 'center',
+    marginLeft: 10,
   },
   deleteAllButton: {
     backgroundColor: '#f44336',
@@ -405,23 +401,15 @@ const styles = StyleSheet.create({
   },
 
   addButton: {
-    // position: 'absolute',
-    // bottom: 24,
-    // right: 24,
     marginVertical: 5,
     backgroundColor: '#4CAF50',
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 24,
-    // ...(Platform.OS === 'android'
-    //   ? {
-    //       elevation: 4, // Android için
-    //     }
-    //   : {}),
-    shadowColor: '#000', // iOS için
-    shadowOffset: {width: 0, height: 2}, // iOS için
-    shadowOpacity: 0.25, // iOS için
-    shadowRadius: 4, // iOS için
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
   },
 
   addButtonText: {
@@ -430,36 +418,33 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  buttonContainer: {
-    flexDirection: 'column',
-    justifyContent: 'flex-start',
-  },
+
   appointmentContactName: {
     marginVertical: 10,
     fontWeight: 'bold',
   },
   pendingStatus: {
-    color: 'orange', // Yazı rengi
-    paddingHorizontal: 10, // Yatay padding
-    paddingVertical: 5, // Dikey padding
-    backgroundColor: 'rgba(255, 255, 0, 0.2)', // Sarı tonlu arka plan
-    borderRadius: 50, // Yuvarlak form
+    color: 'orange',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: 'rgba(255, 255, 0, 0.2)',
+    borderRadius: 50,
     borderWidth: 1,
     borderColor: 'orange',
-    alignSelf: 'flex-start', // İçeriğin genişliği kadar olacak
+    alignSelf: 'flex-start',
   },
   paidStatus: {
-    color: 'green', // Yeşil
-    paddingHorizontal: 10, // Yatay padding
+    color: 'green',
+    paddingHorizontal: 10,
     paddingVertical: 5,
-    backgroundColor: 'rgba(0, 128, 0, 0.2)', // Yeşil arka plan
-    borderRadius: 50, // Yuvarlak form
+    backgroundColor: 'rgba(0, 128, 0, 0.2)',
+    borderRadius: 50,
     borderWidth: 1,
     borderColor: 'green',
     alignSelf: 'flex-start',
   },
   defaultStatus: {
-    color: 'gray', // Varsayılan gri renk
+    color: 'gray',
   },
 
   // -------- MENU ---------
@@ -481,26 +466,26 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   buttonContent: {
-    flexDirection: 'row', // Yatay hizalama
-    alignItems: 'center', // Dikey hizalama
-    justifyContent: 'center', // İçeriği ortalamak için
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   buttonText: {
     fontSize: 16,
     color: 'black',
     fontWeight: 'bold',
-    marginRight: 8, // İkon ile metin arasına boşluk ekler
+    marginRight: 8,
   },
   menuContent: {
     alignItems: 'center',
     backgroundColor: 'white',
     borderRadius: 8,
-    elevation: 5, // Android gölge efekti
-    shadowColor: '#000', // iOS gölge efekti
+    elevation: 5,
+    shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.2,
     shadowRadius: 4,
-    marginTop: 5, // Butonun hemen altından başlasın
+    marginTop: 5,
   },
   menuItemText: {
     fontSize: 16,

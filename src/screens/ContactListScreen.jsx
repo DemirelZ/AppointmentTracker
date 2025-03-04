@@ -50,7 +50,6 @@ const ContactListScreen = ({navigation}) => {
       const result = await getAllContacts();
       setContacts(result);
     } catch (error) {
-      //Alert.alert('Hata', 'Kişiler yüklenirken bir hata oluştu.');
       setError('An error occurred while loading contacts');
     } finally {
       setIsLoading(false);
@@ -275,7 +274,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#578FCA',
   },
   deleteButton: {
-    //backgroundColor: '#f44336',
     backgroundColor: '#D84040',
   },
   buttonText: {
@@ -283,7 +281,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '500',
   },
-
   addButton: {
     position: 'absolute',
     bottom: 24,
@@ -294,10 +291,10 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     borderWidth: 1,
     borderColor: '#388E3C',
-    shadowColor: '#000', // iOS için
-    shadowOffset: {width: 0, height: 2}, // iOS için
-    shadowOpacity: 0.5, // iOS için
-    shadowRadius: 6, // iOS için
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.5,
+    shadowRadius: 6,
   },
   addButtonText: {
     color: '#fff',
@@ -306,10 +303,9 @@ const styles = StyleSheet.create({
   },
 
   // Modal styls
-
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)', // Modal arkaplanına hafif siyahlık ekleme
+    backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -369,7 +365,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   scrollView: {
-    maxHeight: 120, // Açıklamanın yüksekliği sınırlı olacak, kaydırılabilir
+    maxHeight: 120,
     marginVertical: 8,
   },
   date: {

@@ -1,5 +1,4 @@
 import SQLite from 'react-native-sqlite-storage';
-import {format, startOfDay, endOfDay} from 'date-fns';
 
 const db = SQLite.openDatabase(
   {
@@ -12,7 +11,6 @@ const db = SQLite.openDatabase(
   },
 );
 
-// ESKİ Tabloları oluşturma
 // export const createTables = () => {
 //   // Kişiler tablosu
 //   db.transaction(tx => {
@@ -158,42 +156,6 @@ export const deleteContact = id => {
     });
   });
 };
-
-// // Randevu ekleme eski
-// export const addAppointment = (contactId, title, description, date) => {
-//   return new Promise((resolve, reject) => {
-//     db.transaction(tx => {
-//       tx.executeSql(
-//         'INSERT INTO appointments (contact_id, title, description, date) VALUES (?, ?, ?, ?)',
-//         [contactId, title, description, date],
-//         (_, result) => {
-//           resolve(result.insertId);
-//         },
-//         (_, error) => {
-//           reject(error);
-//         },
-//       );
-//     });
-//   });
-// };
-
-// // Randevu güncelleme eski
-// export const updateAppointment = (id, contactId, title, description, date) => {
-//   return new Promise((resolve, reject) => {
-//     db.transaction(tx => {
-//       tx.executeSql(
-//         'UPDATE appointments SET contact_id = ?, title = ?, description = ?, date = ? WHERE id = ?',
-//         [contactId, title, description, date, id],
-//         (_, result) => {
-//           resolve(result);
-//         },
-//         (_, error) => {
-//           reject(error);
-//         },
-//       );
-//     });
-//   });
-// };
 
 //Randevu ekleme
 export const addAppointment = (
@@ -422,7 +384,6 @@ export const UpdateAppointmentCompleteStatus = (appointmentId, checked) => {
   });
 };
 
-// Belirli bir tarih aralığındaki randevuları getirme
 // export const getAppointmentsByDateRange = (startDate, endDate) => {
 //   return new Promise((resolve, reject) => {
 //     // Başlangıç tarihinin başlangıcı (00:00:00)
@@ -576,115 +537,7 @@ export const getAppointmentsByDateRange = async (startDate, endDate) => {
   });
 };
 
-//Şimdilik sen dur
-// export const getAppointmentsByDateRange = async (startDate, endDate) => {
-//   return new Promise((resolve, reject) => {
-//     const start = format(
-//       startOfDay(new Date(startDate)),
-//       'yyyy-MM-dd HH:mm:ss',
-//     );
-//     const end = format(endOfDay(new Date(endDate)), 'yyyy-MM-dd HH:mm:ss');
-
-//     console.log('📅 SQL Query Tarih Aralığı:', start, end);
-
-//     db.transaction(tx => {
-//       // 🛠️ Önce tablonun var olup olmadığını kontrol et ve yoksa oluştur
-//       tx.executeSql(
-//         `CREATE TABLE IF NOT EXISTS appointments (
-//             id INTEGER PRIMARY KEY AUTOINCREMENT,
-//             contact_id INTEGER,
-//             title TEXT NOT NULL,
-//             description TEXT,
-//             date DATETIME NOT NULL,
-//             payment_status TEXT DEFAULT 'Pending',
-//             payment_status_description TEXT,
-//             completed INTEGER DEFAULT 0,
-//             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-//             FOREIGN KEY (contact_id) REFERENCES contacts (id)
-//         )`,
-//         [],
-//         () =>
-//           console.log('✅ Appointments tablosu kontrol edildi / oluşturuldu'),
-//         (_, error) =>
-//           console.error('❌ Appointments tablo oluşturma hatası:', error),
-//       );
-
-//       // 📊 Appointment tablosundaki veri sayısını kontrol et
-//       tx.executeSql(
-//         'SELECT COUNT(*) as count FROM appointments',
-//         [],
-//         (_, result) => {
-//           if (result.rows.length > 0) {
-//             const count = result.rows.item(0).count;
-//             console.log('📊 Tablodaki Randevu Sayısı:', count);
-
-//             if (count === 0) {
-//               //console.warn('⚠️ Hiç randevu bulunamadı.');
-//               resolve([]); // Eğer randevu yoksa boş bir dizi döndür
-//               return;
-//             }
-//           }
-
-//           // 🔍 Tarih Aralığı Sorgusu (Eğer randevular varsa)
-//           tx.executeSql(
-//             `SELECT appointments.*,
-//                     contacts.name AS contact_name,
-//                     contacts.phone AS contact_phone
-//              FROM appointments
-//              LEFT JOIN contacts ON appointments.contact_id = contacts.id
-//              WHERE date >= ? AND date <= ?
-//              ORDER BY date ASC, appointments.created_at DESC`,
-//             [start, end],
-//             (_, result) => {
-//               console.log('✅ SQL Sorgu Başarılı:', result.rows.raw());
-//               resolve(result.rows.raw());
-//             },
-//             (_, error) => {
-//               console.error('❌ SQL Hatası:', JSON.stringify(error));
-//               console.error(
-//                 '📌 SQL Query:',
-//                 `date >= '${start}' AND date <= '${end}'`,
-//               );
-//               reject(
-//                 new Error(
-//                   'SQL sorgusu başarısız oldu: ' + JSON.stringify(error),
-//                 ),
-//               );
-//             },
-//           );
-//         },
-//         (_, error) => {
-//           console.error('❌ SQL Sayım Hatası:', JSON.stringify(error));
-//           reject(new Error('Tablo kontrolü sırasında hata oluştu.'));
-//         },
-//       );
-//     });
-//   });
-// };
-
-// // Bugünün randevu sayısını getirme
-// export const getTodayAppointmentsCount = () => {
-//   return new Promise((resolve, reject) => {
-//     const today = new Date();
-//     today.setHours(0, 0, 0, 0);
-//     const tomorrow = new Date(today);
-//     tomorrow.setDate(tomorrow.getDate() + 1);
-
-//     db.transaction(tx => {
-//       tx.executeSql(
-//         'SELECT COUNT(*) as count FROM appointments WHERE date >= ? AND date < ?',
-//         [today.toISOString(), tomorrow.toISOString()],
-//         (_, result) => {
-//           resolve(result.rows.raw()[0].count);
-//         },
-//         (_, error) => {
-//           reject(error);
-//         },
-//       );
-//     });
-//   });
-// };
-
+// Bugüne ait kaç randevu var
 export const getTodayAppointmentsCount = () => {
   return new Promise((resolve, reject) => {
     const today = new Date();
@@ -710,55 +563,6 @@ export const getTodayAppointmentsCount = () => {
 };
 
 // Bu haftanın randevu sayısını getirme
-// export const getWeekAppointmentsCount = () => {
-//   return new Promise((resolve, reject) => {
-//     const today = new Date();
-//     today.setHours(0, 0, 0, 0);
-//     const weekStart = new Date(today);
-//     weekStart.setDate(weekStart.getDate() - weekStart.getDay());
-//     const weekEnd = new Date(weekStart);
-//     weekEnd.setDate(weekEnd.getDate() + 7);
-
-//     db.transaction(tx => {
-//       tx.executeSql(
-//         'SELECT COUNT(*) as count FROM appointments WHERE date >= ? AND date < ?',
-//         [weekStart.toISOString(), weekEnd.toISOString()],
-//         (_, result) => {
-//           resolve(result.rows.raw()[0].count);
-//         },
-//         (_, error) => {
-//           reject(error);
-//         },
-//       );
-//     });
-//   });
-// };
-
-// // Bu haftanın randevu sayısını getirme
-// export const getWeekAppointmentsCount = () => {
-//   return new Promise((resolve, reject) => {
-//     const today = new Date();
-//     today.setHours(0, 0, 0, 0);
-//     const weekStart = new Date(today);
-//     weekStart.setDate(weekStart.getDate() - weekStart.getDay());
-//     const weekEnd = new Date(weekStart);
-//     weekEnd.setDate(weekEnd.getDate() + 7);
-
-//     db.transaction(tx => {
-//       tx.executeSql(
-//         'SELECT COUNT(*) as count FROM appointments WHERE date >= ? AND date < ?',
-//         [weekStart.toISOString(), weekEnd.toISOString()],
-//         (_, result) => {
-//           resolve(result.rows.raw()[0].count);
-//         },
-//         (_, error) => {
-//           reject(error);
-//         },
-//       );
-//     });
-//   });
-// };
-
 export const getWeekAppointmentsCount = () => {
   return new Promise((resolve, reject) => {
     const today = new Date();
@@ -791,29 +595,7 @@ export const getWeekAppointmentsCount = () => {
   });
 };
 
-// // Bu ayın randevu sayısını getirme
-// export const getMonthAppointmentsCount = () => {
-//   return new Promise((resolve, reject) => {
-//     const today = new Date();
-//     const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-//     const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-//     monthEnd.setHours(23, 59, 59, 999);
-
-//     db.transaction(tx => {
-//       tx.executeSql(
-//         'SELECT COUNT(*) as count FROM appointments WHERE date >= ? AND date <= ?',
-//         [monthStart.toISOString(), monthEnd.toISOString()],
-//         (_, result) => {
-//           resolve(result.rows.raw()[0].count);
-//         },
-//         (_, error) => {
-//           reject(error);
-//         },
-//       );
-//     });
-//   });
-// };
-
+// Bu ayın randevu sayısını getirme
 export const getMonthAppointmentsCount = () => {
   return new Promise((resolve, reject) => {
     const today = new Date();

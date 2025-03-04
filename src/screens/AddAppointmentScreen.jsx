@@ -14,7 +14,6 @@ import {
   Keyboard,
 } from 'react-native';
 import {format} from 'date-fns';
-import {tr} from 'date-fns/locale';
 import {
   addAppointment,
   updateAppointment,
@@ -25,11 +24,6 @@ import CustomRadioButton from '../components/CustomRadioButton';
 import Toast from 'react-native-toast-message';
 import moment from 'moment-timezone';
 import {userTimeZone} from '../../App';
-import AppointmentsScreen from './AppointmentsScreen';
-
-const convertToUserTimeZone = utcDate => {
-  return moment.utc(utcDate).tz(userTimeZone).toDate();
-};
 
 const AddAppointmentScreen = ({navigation, route}) => {
   const editingAppointment = route.params?.appointment;
@@ -161,7 +155,6 @@ const AddAppointmentScreen = ({navigation, route}) => {
     setDate(newDate);
   };
 
-  // const handleDateSelect = selectedDate => {
   //   if (
   //     editingAppointment &&
   //     new Date(selectedDate).getTime() !==
@@ -196,7 +189,7 @@ const AddAppointmentScreen = ({navigation, route}) => {
     }
 
     if (!selectedContact) {
-      Alert.alert('Warning', 'Please select a person');
+      Alert.alert('Warning', 'Please select a contact');
       return;
     }
 
@@ -238,31 +231,12 @@ const AddAppointmentScreen = ({navigation, route}) => {
     }
   };
 
-  // const handleAddNewContact = () => {
-  //   setShowContactModal(false);
-  //   navigation.navigate('Contacts', {
-  //     screen: 'AddContactScreen',
-  //     params: {
-  //       returnToAppointment: true,
-  //     },
-  //     initial: false,
-  //   });
-  // };
-
   const handleAddNewContact = () => {
     setShowContactModal(false);
     navigation.navigate('AddContactScreen', {
       returnToAppointment: true,
     });
   };
-
-  // const getSelectedContactName = () => {
-  //   if (selectedContact) {
-  //     const contact = contacts.find(c => c.id === selectedContact);
-  //     return contact?.name || selectedContactName;
-  //   }
-  //   return null;
-  // };
 
   const getSelectedContactDetails = () => {
     if (selectedContact) {
@@ -347,7 +321,6 @@ const AddAppointmentScreen = ({navigation, route}) => {
             </Text>
           </View>
         )}
-
         <ScrollView
           style={styles.container}
           keyboardShouldPersistTaps="handled"
@@ -393,7 +366,6 @@ const AddAppointmentScreen = ({navigation, route}) => {
               onChangeText={handleInputChange(setTitle)}
               placeholder="Appointment title"
             />
-
             <Text style={styles.label}>Description</Text>
             <TextInput
               style={[styles.input, styles.textArea]}
@@ -403,7 +375,6 @@ const AddAppointmentScreen = ({navigation, route}) => {
               multiline
               numberOfLines={4}
             />
-
             {/**--------------- DATE AND TIME ------------------- */}
             <Text style={styles.label}>Date</Text>
             <TouchableOpacity
@@ -420,7 +391,6 @@ const AddAppointmentScreen = ({navigation, route}) => {
                 {format(date, 'hh:mm a')}
               </Text>
             </TouchableOpacity>
-
             {/**------------ PAYMENT---------------- */}
             <Text style={styles.label}>Payment Status</Text>
             <View style={styles.paymentStatusContainer}>
@@ -429,20 +399,19 @@ const AddAppointmentScreen = ({navigation, route}) => {
                   value="Pending"
                   selectedValue={paymentStatus}
                   onChange={value => {
-                    setPaymentStatus(value); // Seçilen değeri paymentStatus'a aktarır
-                    setIsChanged(true); // Değişiklik olduğunda isChanged'i true yapar
+                    setPaymentStatus(value);
+                    setIsChanged(true);
                   }}
                 />
                 <CustomRadioButton
                   value="Paid"
                   selectedValue={paymentStatus}
                   onChange={value => {
-                    setPaymentStatus(value); // Seçilen değeri paymentStatus'a aktarır
-                    setIsChanged(true); // Değişiklik olduğunda isChanged'i true yapar
+                    setPaymentStatus(value);
+                    setIsChanged(true);
                   }}
                 />
               </View>
-
               <Text style={styles.label}>Payment Description</Text>
               <TextInput
                 style={styles.paymentTextarea}
@@ -452,7 +421,6 @@ const AddAppointmentScreen = ({navigation, route}) => {
                 multiline
               />
             </View>
-
             <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
               <Text style={styles.saveButtonText}>
                 {editingAppointment ? 'Update' : 'Save'}
@@ -463,7 +431,6 @@ const AddAppointmentScreen = ({navigation, route}) => {
 
         {/* Modals */}
         <ContactSelectionModal />
-
         <DateTimePickerModal
           visible={showDatePickerModal}
           onClose={() => setShowDatePickerModal(false)}
@@ -471,7 +438,6 @@ const AddAppointmentScreen = ({navigation, route}) => {
           initialDate={date}
           mode="date"
         />
-
         <DateTimePickerModal
           visible={showTimePickerModal}
           onClose={() => setShowTimePickerModal(false)}
@@ -644,15 +610,15 @@ const styles = StyleSheet.create({
   selectedContactPhoneText: {
     fontSize: 14,
     color: 'gray',
-    marginTop: 4, // İsmin altında biraz boşluk bırakır
+    marginTop: 4,
   },
   paymentStatusContainer: {
-    borderWidth: 1, // Çerçeve ekliyoruz
-    borderColor: '#ddd', // Çerçevenin rengini belirliyoruz
-    borderRadius: 8, // Köşeleri yuvarlatıyoruz
-    padding: 16, // İçeriğe boşluk ekliyoruz
-    backgroundColor: '#f9f9f9', // Arka plan rengini belirliyoruz
-    marginVertical: 0, // Üst ve alt boşluk
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 16,
+    backgroundColor: '#f9f9f9',
+    marginVertical: 0,
   },
   radioGroup: {
     flexDirection: 'row',
@@ -670,15 +636,15 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   changeWarning: {
-    position: 'absolute', // Sabit pozisyon
-    top: 6, // Ekranın üst kısmında
+    position: 'absolute',
+    top: 6,
     left: 0,
     right: 0,
     backgroundColor: '#FFD300',
     padding: 5,
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 100, // Diğer içeriklerin üstünde
+    zIndex: 100,
   },
   changeWarningText: {
     fontSize: 16,

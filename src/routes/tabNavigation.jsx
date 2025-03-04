@@ -1,5 +1,5 @@
-import {Dimensions, StyleSheet, View, Button} from 'react-native';
-import React, {useMemo} from 'react';
+import {StyleSheet, View, Button} from 'react-native';
+import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import HomeScreen from '../screens/HomeScreen';

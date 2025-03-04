@@ -1,5 +1,4 @@
 import React from 'react';
-import {StyleSheet} from 'react-native';
 import TabNavigation from './tabNavigation';
 import AddAppointmentScreen from '../screens/AddAppointmentScreen';
 import PastAppointmentsScreen from '../screens/PastAppointmentScreen';

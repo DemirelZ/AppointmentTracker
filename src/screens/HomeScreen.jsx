@@ -9,7 +9,6 @@ import {
   Modal,
 } from 'react-native';
 import {format, addDays, startOfDay, subDays} from 'date-fns';
-import {tr} from 'date-fns/locale';
 import {
   getAppointmentsByDateRange,
   getTodayAppointmentsCount,
@@ -20,7 +19,7 @@ import {ArrowLeft2, ArrowRight2} from 'iconsax-react-native';
 
 const HomeScreen = ({navigation}) => {
   const [weekAppointments, setWeekAppointments] = useState([]);
-  //const [startDate, setStartDate] = useState(startOfDay(new Date()));
+
   const [startDate, setStartDate] = useState(() => {
     const today = new Date();
     const dayOfWeek = today.getDay(); // 0 (Pazar) - 6 (Cumartesi)
@@ -86,9 +85,6 @@ const HomeScreen = ({navigation}) => {
     );
   };
 
-  // const goToToday = () => {
-  //   setStartDate(startOfDay(new Date()));
-  // };
   const goToToday = () => {
     const today = new Date();
     const dayOfWeek = today.getDay(); // Bugünün haftanın günü (0 - Pazar, 1 - Pazartesi, ...)
@@ -188,11 +184,6 @@ const HomeScreen = ({navigation}) => {
     <View style={styles.container}>
       {renderStats()}
       <View style={styles.header}>
-        {/* <TouchableOpacity
-          onPress={() => setStartDate(addDays(startDate, -7))}
-          style={styles.headerButton}>
-          <Text style={styles.headerButtonText}>← Önceki Hafta</Text>
-        </TouchableOpacity> */}
         <TouchableOpacity
           onPress={() => setStartDate(addDays(startDate, -7))}
           style={styles.headerButton}>
@@ -206,11 +197,6 @@ const HomeScreen = ({navigation}) => {
           style={[styles.headerButton, styles.todayButton]}>
           <Text style={styles.todayButtonText}>This Week</Text>
         </TouchableOpacity>
-        {/* <TouchableOpacity
-          onPress={() => setStartDate(addDays(startDate, 7))}
-          style={styles.headerButton}>
-          <Text style={styles.headerButtonText}>Sonraki Hafta →</Text>
-        </TouchableOpacity> */}
         <TouchableOpacity
           onPress={() => setStartDate(addDays(startDate, 7))}
           style={styles.headerButton}>
@@ -309,7 +295,6 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   todayButton: {
-    // backgroundColor: '#2196F3',
     backgroundColor: '#3674B5',
     paddingHorizontal: 16,
     paddingVertical: 8,
@@ -438,7 +423,7 @@ const styles = StyleSheet.create({
 
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Koyu şeffaf arka plan
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -490,7 +475,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   scrollView: {
-    maxHeight: 120, // Açıklamanın yüksekliği sınırlı olacak, kaydırılabilir
+    maxHeight: 120,
   },
   modalDescription: {
     fontSize: 15,

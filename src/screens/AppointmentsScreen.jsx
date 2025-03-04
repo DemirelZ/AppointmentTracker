@@ -9,17 +9,14 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {format} from 'date-fns';
-import {tr} from 'date-fns/locale';
-import db, {
+import {
   deleteAppointment,
   getUpcomingAppointments,
   UpdateAppointmentCompleteStatus,
 } from '../service/database';
-import {Calendar, Edit2, Trash} from 'iconsax-react-native';
+import {Edit2, Trash} from 'iconsax-react-native';
 import CustomCheckbox from '../components/CustomCheckbox';
 import Toast from 'react-native-toast-message';
-import moment from 'moment-timezone';
-import {userTimeZone} from '../../App';
 
 const AppointmentsScreen = ({navigation}) => {
   const [upcomingAppointments, setUpcomingAppointments] = useState([]);
@@ -87,15 +84,11 @@ const AppointmentsScreen = ({navigation}) => {
 
   const getPaymentStatusStyle = status => {
     if (status === 'Pending') {
-      return styles.pendingStatus; // Sarı daire için stil
+      return styles.pendingStatus;
     } else if (status === 'Paid') {
-      return styles.paidStatus; // Yeşil daire için stil
+      return styles.paidStatus;
     }
-    return styles.defaultStatus; // Varsayılan stil
-  };
-
-  const convertToUserTimeZone = utcDate => {
-    return moment.utc(utcDate).tz(userTimeZone).toDate(); // Date nesnesi olarak dön
+    return styles.defaultStatus;
   };
 
   const renderItem = ({item}) => (
@@ -106,23 +99,25 @@ const AppointmentsScreen = ({navigation}) => {
         </View>
         <View style={styles.appointmentDetails}>
           <View style={styles.dateContainer}>
-            <Calendar size={18} color="#888" />
             <Text style={styles.appointmentDate}>
-              {format(new Date(item.date), 'PP - h:mm a')}
+              📅 {format(new Date(item.date), 'PP - h:mm a')}
             </Text>
           </View>
           {item.description && (
             <Text style={styles.appointmentDescription}>
-              {item.description}
+              🗒️ {item.description}
             </Text>
           )}
-          <Text style={styles.appointmentContactName}>{item.contact_name}</Text>
+          <Text style={styles.appointmentContactName}>
+            👤 {item.contact_name}
+          </Text>
           <Text
             style={[
               styles.appointmentDescription,
               getPaymentStatusStyle(item.payment_status),
             ]}>
-            Payment: {item.payment_status === 'Pending' ? 'Pending' : 'Paid'}
+            Payment:{' '}
+            {item.payment_status === 'Pending' ? '⌛ Pending' : '✅ Paid'}
           </Text>
           <CustomCheckbox
             checked={item.completed === 1}
@@ -141,6 +136,7 @@ const AppointmentsScreen = ({navigation}) => {
           />
         </View>
       </View>
+
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[styles.button, styles.editButton]}
@@ -148,14 +144,14 @@ const AppointmentsScreen = ({navigation}) => {
             navigation.navigate('AddAppointmentScreen', {appointment: item})
           }>
           <Edit2 size={20} color="#fff" />
-          <Text style={styles.editText}>Edit appointment &</Text>
+          <Text style={styles.editText}> Edit appointment & </Text>
           <Text style={styles.editText}>payment status</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.button, styles.deleteButton]}
           onPress={() => handleDelete(item.id)}>
           <Trash size={20} color="#fff" />
-          <Text style={styles.editText}>Delete appointment</Text>
+          <Text style={styles.editText}> Delete</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -206,7 +202,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   appointmentItem: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     backgroundColor: '#f0f4f7',
     borderRadius: 15,
     marginBottom: 20,
@@ -234,8 +230,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   buttonContainer: {
-    flexDirection: 'column',
-    justifyContent: 'flex-start',
+    flexDirection: 'row',
   },
 
   appointmentDetails: {
@@ -249,7 +244,6 @@ const styles = StyleSheet.create({
   appointmentDate: {
     fontSize: 14,
     color: '#666',
-    marginLeft: 5,
   },
   appointmentDescription: {
     fontSize: 15,
@@ -259,7 +253,7 @@ const styles = StyleSheet.create({
   contactName: {
     marginTop: 10,
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: '700',
     color: '#333',
   },
   countdownContainer: {
@@ -276,16 +270,16 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   button: {
-    paddingHorizontal: 12,
+    flexDirection: 'row',
+    paddingHorizontal: 8,
     paddingVertical: 6,
+    marginTop: 16,
     borderRadius: 4,
-    marginLeft: 8,
   },
   editButton: {
-    //backgroundColor: '#2196F3',
+    flex: 1,
     backgroundColor: '#578FCA',
     alignItems: 'center',
-    marginBottom: 20,
   },
   editText: {
     color: '#fff',
@@ -295,6 +289,7 @@ const styles = StyleSheet.create({
   deleteButton: {
     backgroundColor: '#D84040',
     alignItems: 'center',
+    marginLeft: 10,
   },
   paymentButton: {
     backgroundColor: '#ba68c8',
@@ -314,10 +309,10 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     borderWidth: 1,
     borderColor: '#388E3C',
-    shadowColor: '#000', // iOS için
-    shadowOffset: {width: 0, height: 2}, // iOS için
-    shadowOpacity: 0.5, // iOS için
-    shadowRadius: 6, // iOS için
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.5,
+    shadowRadius: 6,
   },
 
   addButtonText: {
@@ -329,7 +324,7 @@ const styles = StyleSheet.create({
   // MODAL
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)', // Modal arkaplanına hafif siyahlık ekleme
+    backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -393,7 +388,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   scrollView: {
-    maxHeight: 120, // Açıklamanın yüksekliği sınırlı olacak, kaydırılabilir
+    maxHeight: 120,
     marginVertical: 8,
   },
   date: {
@@ -424,27 +419,27 @@ const styles = StyleSheet.create({
   },
 
   pendingStatus: {
-    color: 'orange', // Yazı rengi
-    paddingHorizontal: 10, // Yatay padding
-    paddingVertical: 5, // Dikey padding
-    backgroundColor: 'rgba(255, 255, 0, 0.2)', // Sarı tonlu arka plan
-    borderRadius: 50, // Yuvarlak form
+    color: 'orange',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: 'rgba(255, 255, 0, 0.2)',
+    borderRadius: 50,
     borderWidth: 1,
     borderColor: 'orange',
-    alignSelf: 'flex-start', // İçeriğin genişliği kadar olacak
+    alignSelf: 'flex-start',
   },
   paidStatus: {
-    color: 'green', // Yeşil
-    paddingHorizontal: 10, // Yatay padding
+    color: 'green',
+    paddingHorizontal: 10,
     paddingVertical: 5,
-    backgroundColor: 'rgba(0, 128, 0, 0.2)', // Yeşil arka plan
-    borderRadius: 50, // Yuvarlak form
+    backgroundColor: 'rgba(0, 128, 0, 0.2)',
+    borderRadius: 50,
     borderWidth: 1,
     borderColor: 'green',
     alignSelf: 'flex-start',
   },
   defaultStatus: {
-    color: 'gray', // Varsayılan gri renk
+    color: 'gray',
   },
 });
 

@@ -40,7 +40,7 @@ const AddContactScreen = ({navigation, route}) => {
   // Kullanıcı bir input alanını değiştirdiğinde bunu true yap
   const handleInputChange = setter => text => {
     setter(text); // Input değerini güncelle
-    setIsChanged(true); // Kullanıcının değişiklik yaptığını işaretle
+    setIsChanged(true);
   };
 
   useEffect(() => {
@@ -54,7 +54,7 @@ const AddContactScreen = ({navigation, route}) => {
         setIsChanged(false); // 3 saniye sonra isChanged'i false yaparak uyarıyı gizle
       }, 3000);
 
-      return () => clearTimeout(timer); // Timer'ı temizle
+      return () => clearTimeout(timer);
     }
   }, [isChanged]);
 
@@ -72,29 +72,6 @@ const AddContactScreen = ({navigation, route}) => {
       } else {
         contactId = await addContact(name, phone, email);
       }
-
-      // if (returnToAppointment) {
-      //   // Önce Appointments tab'ına dön ve yeni kişiyi seç
-      //   navigation.navigate('Appointments', {
-      //     screen: 'AddAppointmentScreen',
-      //     params: {
-      //       selectedContactId: contactId,
-      //       selectedContactName: name,
-      //       clearForm: true,
-      //     },
-      //   });
-      // } else {
-      //   Toast.show({
-      //     type: 'success',
-      //     text1: editingContact
-      //       ? 'The contact was successfully updated'
-      //       : 'The contact was successfully created',
-      //     visibilityTime: 2000,
-      //     position: 'top',
-      //     topOffset: 90,
-      //   });
-      //   navigation.goBack();
-      // }
 
       if (returnToAppointment) {
         navigation.navigate('AddAppointmentScreen', {
@@ -128,7 +105,7 @@ const AddContactScreen = ({navigation, route}) => {
         {isChanged && editingContact && (
           <View style={styles.changeWarning}>
             <Text style={styles.changeWarningText}>
-              Please remember to save the changes!
+              Please don't forget to save the changes!
             </Text>
           </View>
         )}
@@ -232,15 +209,15 @@ const styles = StyleSheet.create({
   },
 
   changeWarning: {
-    position: 'absolute', // Sabit pozisyon
-    top: 6, // Ekranın üst kısmında
+    position: 'absolute',
+    top: 6,
     left: 0,
     right: 0,
     backgroundColor: '#FFD300',
     padding: 5,
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 100, // Diğer içeriklerin üstünde
+    zIndex: 100,
   },
   changeWarningText: {
     fontSize: 16,
