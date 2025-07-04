@@ -165,11 +165,12 @@ export const addAppointment = (
   date,
   paymentStatus = 'Pending',
   paymentStatusDescription = null,
+  completed = false,
 ) => {
   return new Promise((resolve, reject) => {
     db.transaction(tx => {
       tx.executeSql(
-        'INSERT INTO appointments (contact_id, title, description, date, payment_status, payment_status_description) VALUES (?, ?, ?, ?, ?, ?)',
+        'INSERT INTO appointments (contact_id, title, description, date, payment_status, payment_status_description, completed) VALUES (?, ?, ?, ?, ?, ?, ?)',
         [
           contactId,
           title,
@@ -177,6 +178,7 @@ export const addAppointment = (
           date,
           paymentStatus,
           paymentStatusDescription,
+          completed ? 1 : 0,
         ],
         (_, result) => {
           resolve(result.insertId);
@@ -198,11 +200,12 @@ export const updateAppointment = (
   date,
   paymentStatus,
   paymentStatusDescription,
+  completed,
 ) => {
   return new Promise((resolve, reject) => {
     db.transaction(tx => {
       tx.executeSql(
-        'UPDATE appointments SET contact_id = ?, title = ?, description = ?, date = ?, payment_status = ?, payment_status_description = ? WHERE id = ?',
+        'UPDATE appointments SET contact_id = ?, title = ?, description = ?, date = ?, payment_status = ?, payment_status_description = ?, completed = ? WHERE id = ?',
         [
           contactId,
           title,
@@ -210,6 +213,7 @@ export const updateAppointment = (
           date,
           paymentStatus,
           paymentStatusDescription,
+          completed ? 1 : 0,
           id,
         ],
         (_, result) => {
@@ -292,6 +296,54 @@ export const getAllAppointments = () => {
                  LEFT JOIN contacts ON appointments.contact_id = contacts.id 
                  ORDER BY appointments.created_at DESC, appointments.id DESC`,
         [],
+        (_, result) => {
+          resolve(result.rows.raw());
+        },
+        (_, error) => {
+          reject(error);
+        },
+      );
+    });
+  });
+};
+
+// Randevularda arama yapma
+export const searchAppointments = searchTerm => {
+  return new Promise((resolve, reject) => {
+    db.transaction(tx => {
+      const searchPattern = `%${searchTerm}%`;
+      tx.executeSql(
+        `SELECT appointments.*, contacts.name as contact_name 
+         FROM appointments 
+         LEFT JOIN contacts ON appointments.contact_id = contacts.id 
+         WHERE appointments.title LIKE ? 
+         OR appointments.description LIKE ? 
+         OR contacts.name LIKE ?
+         ORDER BY appointments.date ASC`,
+        [searchPattern, searchPattern, searchPattern],
+        (_, result) => {
+          resolve(result.rows.raw());
+        },
+        (_, error) => {
+          reject(error);
+        },
+      );
+    });
+  });
+};
+
+// Kişilerde arama yapma
+export const searchContacts = searchTerm => {
+  return new Promise((resolve, reject) => {
+    db.transaction(tx => {
+      const searchPattern = `%${searchTerm}%`;
+      tx.executeSql(
+        `SELECT * FROM contacts 
+         WHERE name LIKE ? 
+         OR phone LIKE ? 
+         OR email LIKE ?
+         ORDER BY name ASC`,
+        [searchPattern, searchPattern, searchPattern],
         (_, result) => {
           resolve(result.rows.raw());
         },

@@ -15,6 +15,12 @@ import {
 import {addContact, updateContact} from '../service/database';
 import {useFocusEffect} from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
+import {
+  validateName,
+  validateEmail,
+  validatePhone,
+  getValidationErrorMessage,
+} from '../utils/validation';
 
 const AddContactScreen = ({navigation, route}) => {
   const editingContact = route?.params?.contact;
@@ -24,6 +30,7 @@ const AddContactScreen = ({navigation, route}) => {
   const [phone, setPhone] = useState(editingContact?.phone || '');
   const [email, setEmail] = useState(editingContact?.email || '');
 
+  const [errors, setErrors] = useState({});
   const [isChanged, setIsChanged] = useState(false);
   const isChangedRef = useRef(isChanged);
 
@@ -58,9 +65,37 @@ const AddContactScreen = ({navigation, route}) => {
     }
   }, [isChanged]);
 
+  const validateForm = () => {
+    const newErrors = {};
+
+    // Validate name
+    const nameError = getValidationErrorMessage('name', name);
+    if (nameError) {
+      newErrors.name = nameError;
+    }
+
+    // Validate email if provided
+    if (email.trim()) {
+      const emailError = getValidationErrorMessage('email', email);
+      if (emailError) {
+        newErrors.email = emailError;
+      }
+    }
+
+    // Validate phone if provided
+    if (phone.trim()) {
+      const phoneError = getValidationErrorMessage('phone', phone);
+      if (phoneError) {
+        newErrors.phone = phoneError;
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSave = async () => {
-    if (!name.trim()) {
-      Alert.alert('Warning', 'Please enter the contact name');
+    if (!validateForm()) {
       return;
     }
 
@@ -116,30 +151,37 @@ const AddContactScreen = ({navigation, route}) => {
           <View style={styles.form}>
             <Text style={styles.label}>Name Surname *</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, errors.name && styles.inputError]}
               value={name}
               onChangeText={handleInputChange(setName)}
               placeholder="Name Surname"
             />
+            {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
 
             <Text style={styles.label}>Phone</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, errors.phone && styles.inputError]}
               value={phone}
               onChangeText={handleInputChange(setPhone)}
               placeholder="Phone number"
               keyboardType="phone-pad"
             />
+            {errors.phone && (
+              <Text style={styles.errorText}>{errors.phone}</Text>
+            )}
 
             <Text style={styles.label}>E-mail</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, errors.email && styles.inputError]}
               value={email}
               onChangeText={handleInputChange(setEmail)}
               placeholder="E-mail address"
               keyboardType="email-address"
               autoCapitalize="none"
             />
+            {errors.email && (
+              <Text style={styles.errorText}>{errors.email}</Text>
+            )}
 
             <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
               <Text style={styles.saveButtonText}>
@@ -222,6 +264,16 @@ const styles = StyleSheet.create({
   changeWarningText: {
     fontSize: 16,
     color: 'black',
+  },
+  inputError: {
+    borderColor: '#f44336',
+    borderWidth: 2,
+  },
+  errorText: {
+    color: '#f44336',
+    fontSize: 12,
+    marginTop: 4,
+    marginLeft: 4,
   },
 });
 

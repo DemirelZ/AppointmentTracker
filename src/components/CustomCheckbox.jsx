@@ -9,7 +9,7 @@ const CustomCheckbox = ({checked, onToggle}) => {
       <View style={[styles.checkbox, checked && styles.checked]}>
         {checked && <Text style={styles.checkmark}>✓</Text>}
       </View>
-      <Text style={styles.label}>
+      <Text style={[styles.label, checked && styles.completedLabel]}>
         {checked ? 'Completed' : 'Not Completed'}
       </Text>
     </TouchableOpacity>
@@ -45,5 +45,9 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     color: '#3498db',
+  },
+  completedLabel: {
+    color: '#27ae60',
+    fontWeight: 'bold',
   },
 });

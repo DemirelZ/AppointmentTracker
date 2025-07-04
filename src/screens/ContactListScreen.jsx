@@ -10,11 +10,13 @@ import {
   SafeAreaView,
   ScrollView,
   ActivityIndicator,
+  TextInput,
 } from 'react-native';
 import {
   getAllContacts,
   deleteContact,
   fetchAppointmentsByContactId,
+  searchContacts,
 } from '../service/database';
 import {format} from 'date-fns';
 import {tr, enUS, fr} from 'date-fns/locale';
@@ -22,6 +24,8 @@ import Toast from 'react-native-toast-message';
 
 const ContactListScreen = ({navigation}) => {
   const [contacts, setContacts] = useState([]);
+  const [filteredContacts, setFilteredContacts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [selectedContact, setSelectedContact] = useState(null);
   const [appointments, setAppointments] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -49,12 +53,33 @@ const ContactListScreen = ({navigation}) => {
     try {
       const result = await getAllContacts();
       setContacts(result);
+      setFilteredContacts(result);
     } catch (error) {
       setError('An error occurred while loading contacts');
     } finally {
       setIsLoading(false);
     }
   }, []);
+
+  const handleSearch = useCallback(
+    async term => {
+      setSearchTerm(term);
+
+      if (!term.trim()) {
+        setFilteredContacts(contacts);
+        return;
+      }
+
+      try {
+        const searchResults = await searchContacts(term);
+        setFilteredContacts(searchResults);
+      } catch (error) {
+        console.error('Search error:', error);
+        setFilteredContacts([]);
+      }
+    },
+    [contacts],
+  );
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -133,6 +158,17 @@ const ContactListScreen = ({navigation}) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Search Bar */}
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search contacts..."
+          value={searchTerm}
+          onChangeText={handleSearch}
+          placeholderTextColor="#999"
+        />
+      </View>
+
       {isLoading && <ActivityIndicator size="large" color="#0000ff" />}
 
       {error && (
@@ -142,7 +178,7 @@ const ContactListScreen = ({navigation}) => {
       )}
       {!isLoading && !error && (
         <FlatList
-          data={contacts}
+          data={filteredContacts}
           renderItem={renderItem}
           keyExtractor={item => item.id.toString()}
           contentContainerStyle={styles.listContainer}
@@ -150,7 +186,9 @@ const ContactListScreen = ({navigation}) => {
             <View
               style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
               <Text style={{textAlign: 'center'}}>
-                No one has been added to the list yet
+                {searchTerm
+                  ? 'No search results found'
+                  : 'No contacts added yet'}
               </Text>
             </View>
           }
@@ -227,6 +265,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  searchContainer: {
+    padding: 16,
+    backgroundColor: '#f5f5f5',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
+  searchInput: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
   listContainer: {
     padding: 16,

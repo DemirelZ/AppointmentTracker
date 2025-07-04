@@ -7,12 +7,14 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  TextInput,
 } from 'react-native';
 import {format} from 'date-fns';
 import {
   deleteAppointment,
   getUpcomingAppointments,
   UpdateAppointmentCompleteStatus,
+  searchAppointments,
 } from '../service/database';
 import {Edit2, Trash} from 'iconsax-react-native';
 import CustomCheckbox from '../components/CustomCheckbox';
@@ -20,6 +22,8 @@ import Toast from 'react-native-toast-message';
 
 const AppointmentsScreen = ({navigation}) => {
   const [upcomingAppointments, setUpcomingAppointments] = useState([]);
+  const [filteredAppointments, setFilteredAppointments] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -31,13 +35,33 @@ const AppointmentsScreen = ({navigation}) => {
     try {
       const result = await getUpcomingAppointments();
       setUpcomingAppointments(result);
+      setFilteredAppointments(result);
     } catch (error) {
-      //Alert.alert('Hata', 'Randevular yüklenirken bir hata oluştu.');
-      setError('Randevular yüklenirken bir hata oluştu.');
+      setError('Failed to load appointments.');
     } finally {
       setIsLoading(false);
     }
   }, []);
+
+  const handleSearch = useCallback(
+    async term => {
+      setSearchTerm(term);
+
+      if (!term.trim()) {
+        setFilteredAppointments(upcomingAppointments);
+        return;
+      }
+
+      try {
+        const searchResults = await searchAppointments(term);
+        setFilteredAppointments(searchResults);
+      } catch (error) {
+        console.error('Search error:', error);
+        setFilteredAppointments([]);
+      }
+    },
+    [upcomingAppointments],
+  );
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -92,7 +116,11 @@ const AppointmentsScreen = ({navigation}) => {
   };
 
   const renderItem = ({item}) => (
-    <View style={styles.appointmentItem}>
+    <View
+      style={[
+        styles.appointmentItem,
+        item.completed === 1 && styles.completedAppointmentItem,
+      ]}>
       <View style={styles.infoContainer}>
         <View style={styles.appointmentHeader}>
           <Text style={styles.appointmentTitle}>{item.title}</Text>
@@ -122,16 +150,45 @@ const AppointmentsScreen = ({navigation}) => {
           <CustomCheckbox
             checked={item.completed === 1}
             onToggle={async newState => {
-              await UpdateAppointmentCompleteStatus(item.id, newState);
+              try {
+                await UpdateAppointmentCompleteStatus(item.id, newState);
 
-              // 📌 State'i güncelle ve UI'ı yenile
-              setUpcomingAppointments(prevAppointments =>
-                prevAppointments.map(appointment =>
-                  appointment.id === item.id
-                    ? {...appointment, completed: newState ? 1 : 0}
-                    : appointment,
-                ),
-              );
+                // 📌 Her iki state'i de güncelle
+                setUpcomingAppointments(prevAppointments =>
+                  prevAppointments.map(appointment =>
+                    appointment.id === item.id
+                      ? {...appointment, completed: newState ? 1 : 0}
+                      : appointment,
+                  ),
+                );
+
+                setFilteredAppointments(prevFiltered =>
+                  prevFiltered.map(appointment =>
+                    appointment.id === item.id
+                      ? {...appointment, completed: newState ? 1 : 0}
+                      : appointment,
+                  ),
+                );
+
+                Toast.show({
+                  type: 'success',
+                  text1: newState
+                    ? 'Appointment marked as completed'
+                    : 'Appointment marked as incomplete',
+                  visibilityTime: 1000,
+                  position: 'top',
+                  topOffset: 90,
+                });
+              } catch (error) {
+                console.error('Error updating completion status:', error);
+                Toast.show({
+                  type: 'error',
+                  text1: 'Failed to update completion status',
+                  visibilityTime: 1000,
+                  position: 'top',
+                  topOffset: 90,
+                });
+              }
             }}
           />
         </View>
@@ -159,6 +216,17 @@ const AppointmentsScreen = ({navigation}) => {
 
   return (
     <View style={styles.container}>
+      {/* Search Bar */}
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search appointments..."
+          value={searchTerm}
+          onChangeText={handleSearch}
+          placeholderTextColor="#999"
+        />
+      </View>
+
       {isLoading && <ActivityIndicator size="large" color="#0000ff" />}
 
       {error && (
@@ -169,7 +237,7 @@ const AppointmentsScreen = ({navigation}) => {
 
       {!isLoading && !error && (
         <FlatList
-          data={upcomingAppointments}
+          data={filteredAppointments}
           renderItem={renderItem}
           keyExtractor={item => item.id.toString()}
           contentContainerStyle={styles.listContainer}
@@ -177,7 +245,9 @@ const AppointmentsScreen = ({navigation}) => {
             <View
               style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
               <Text style={{textAlign: 'center'}}>
-                No appointment has been added to the list yet
+                {searchTerm
+                  ? 'No search results found'
+                  : 'No upcoming appointments'}
               </Text>
             </View>
           }
@@ -197,6 +267,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  searchContainer: {
+    padding: 16,
+    backgroundColor: '#f5f5f5',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
+  searchInput: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
   listContainer: {
     padding: 16,
@@ -440,6 +524,11 @@ const styles = StyleSheet.create({
   },
   defaultStatus: {
     color: 'gray',
+  },
+  completedAppointmentItem: {
+    backgroundColor: '#e8f5e8',
+    borderColor: '#27ae60',
+    opacity: 0.8,
   },
 });
 

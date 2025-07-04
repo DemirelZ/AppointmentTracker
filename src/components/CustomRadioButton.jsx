@@ -1,12 +1,20 @@
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 
-const CustomRadioButton = ({value, selectedValue, onChange}) => {
+const CustomRadioButton = ({value, selectedValue, onChange, label}) => {
+  const displayText = label || value;
+  const isPending = value === 'Pending' || value === false;
+  const isPaid = value === 'Paid' || value === true;
+
   return (
     <TouchableOpacity
       onPress={() => onChange(value)}
       style={[
         {flexDirection: 'row', alignItems: 'center'},
-        value === 'Pending' ? styles.pendingStatus : styles.paidStatus,
+        isPending
+          ? styles.pendingStatus
+          : isPaid
+          ? styles.paidStatus
+          : styles.defaultStatus,
       ]}>
       <View
         style={{
@@ -14,7 +22,7 @@ const CustomRadioButton = ({value, selectedValue, onChange}) => {
           height: 20,
           borderRadius: 10,
           borderWidth: 2,
-          borderColor: value == 'Pending' ? 'orange' : 'green',
+          borderColor: isPending ? 'orange' : isPaid ? 'green' : '#666',
           marginRight: 8,
           justifyContent: 'center',
           alignItems: 'center',
@@ -25,13 +33,13 @@ const CustomRadioButton = ({value, selectedValue, onChange}) => {
               width: 10,
               height: 10,
               borderRadius: 5,
-              backgroundColor: value === 'Pending' ? 'orange' : 'green',
+              backgroundColor: isPending ? 'orange' : isPaid ? 'green' : '#666',
             }}
           />
         )}
       </View>
-      <Text style={{color: value === 'Pending' ? 'orange' : 'green'}}>
-        {value}
+      <Text style={{color: isPending ? 'orange' : isPaid ? 'green' : '#666'}}>
+        {displayText}
       </Text>
     </TouchableOpacity>
   );
@@ -56,6 +64,16 @@ const styles = StyleSheet.create({
     borderRadius: 50, // Yuvarlak form
     borderWidth: 1,
     borderColor: 'green',
+    alignSelf: 'flex-start',
+  },
+  defaultStatus: {
+    color: '#666',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: 'rgba(102, 102, 102, 0.2)',
+    borderRadius: 50,
+    borderWidth: 1,
+    borderColor: '#666',
     alignSelf: 'flex-start',
   },
 });

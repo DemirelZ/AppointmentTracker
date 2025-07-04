@@ -9,13 +9,16 @@ import {
   Modal,
 } from 'react-native';
 import {format, addDays, startOfDay, subDays} from 'date-fns';
+import {enUS} from 'date-fns/locale';
 import {
   getAppointmentsByDateRange,
   getTodayAppointmentsCount,
   getWeekAppointmentsCount,
   getMonthAppointmentsCount,
+  deleteAppointment,
 } from '../service/database';
 import {ArrowLeft2, ArrowRight2} from 'iconsax-react-native';
+import AppointmentDetailModal from '../components/AppointmentDetailModal';
 
 const HomeScreen = ({navigation}) => {
   const [weekAppointments, setWeekAppointments] = useState([]);
@@ -29,6 +32,7 @@ const HomeScreen = ({navigation}) => {
 
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
 
   const [stats, setStats] = useState({
     today: 0,
@@ -113,6 +117,46 @@ const HomeScreen = ({navigation}) => {
     </View>
   );
 
+  const handleAppointmentPress = appointment => {
+    setSelectedAppointment(appointment);
+    setShowDetailModal(true);
+  };
+
+  const handleEditAppointment = appointment => {
+    navigation.navigate('AddAppointmentScreen', {
+      appointment: appointment,
+    });
+  };
+
+  const handleDeleteAppointment = async appointmentId => {
+    Alert.alert(
+      'Delete Appointment',
+      'Are you sure you want to delete this appointment?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteAppointment(appointmentId);
+              loadWeekAppointments();
+              loadStats();
+            } catch (error) {
+              Alert.alert(
+                'Error',
+                'An error occurred while deleting the appointment.',
+              );
+            }
+          },
+        },
+      ],
+    );
+  };
+
   const renderDayAppointments = date => {
     const dayAppointments = weekAppointments.filter(
       app =>
@@ -129,7 +173,7 @@ const HomeScreen = ({navigation}) => {
         style={[styles.dayContainer, isWeekend && styles.weekendDayContainer]}
         key={date.toISOString()}>
         <Text style={[styles.dayHeader, isCurrentDay && styles.todayHeader]}>
-          {format(date, 'EEEE, d MMMM')}
+          {format(date, 'EEEE, d MMMM', {locale: enUS})}
           {isCurrentDay && <Text style={styles.todayBadge}> • Today</Text>}
         </Text>
         <View
@@ -147,12 +191,9 @@ const HomeScreen = ({navigation}) => {
                   isWeekend && !isCurrentDay && styles.weekendAppointmentItem,
                   isCurrentDay && styles.todayAppointmentItem,
                 ]}
-                onPress={() => {
-                  setSelectedAppointment(appointment); // Seçilen randevuyu güncelle
-                  setModalVisible(true); // Modal'ı aç
-                }}>
+                onPress={() => handleAppointmentPress(appointment)}>
                 <Text style={styles.appointmentTime}>
-                  {format(new Date(appointment.date), 'hh:mm a')}
+                  {format(new Date(appointment.date), 'HH:mm')}
                 </Text>
                 <View style={styles.appointmentDetails}>
                   <Text style={styles.appointmentTitle}>
@@ -165,7 +206,7 @@ const HomeScreen = ({navigation}) => {
               </TouchableOpacity>
             ))
           ) : (
-            <Text style={styles.noAppointment}>No appointment</Text>
+            <Text style={styles.noAppointment}>No appointments</Text>
           )}
         </View>
       </View>
@@ -187,91 +228,28 @@ const HomeScreen = ({navigation}) => {
         <TouchableOpacity
           onPress={() => setStartDate(addDays(startDate, -7))}
           style={styles.headerButton}>
-          <View style={styles.prevWeek}>
-            <ArrowLeft2 size="22" color="#666" />
-            <Text style={styles.headerButtonText}>Previous Week</Text>
-          </View>
+          <Text style={styles.headerButtonText}>← Previous Week</Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={goToToday}
           style={[styles.headerButton, styles.todayButton]}>
-          <Text style={styles.todayButtonText}>This Week</Text>
+          <Text style={styles.todayButtonText}>Today</Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => setStartDate(addDays(startDate, 7))}
           style={styles.headerButton}>
-          <View style={styles.afterWeek}>
-            <Text style={styles.headerButtonText}>Next Week</Text>
-            <ArrowRight2 size="22" color="#666" />
-          </View>
+          <Text style={styles.headerButtonText}>Next Week →</Text>
         </TouchableOpacity>
       </View>
       <ScrollView style={styles.weekContainer}>{renderWeek()}</ScrollView>
-      <Modal
-        visible={modalVisible}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setModalVisible(false)}>
-        <View style={styles.overlay}>
-          <View style={styles.modalContainer}>
-            <View style={styles.modalFrame}>
-              <View style={styles.modalContent}>
-                {selectedAppointment ? (
-                  <>
-                    <Text style={styles.modalTitleHead}>
-                      Appointment Details
-                    </Text>
-                    <Text
-                      style={styles.modalTitle}
-                      numberOfLines={3}
-                      ellipsizeMode="tail">
-                      {selectedAppointment.title}
-                    </Text>
 
-                    <View style={styles.detailContainer}>
-                      <Text style={styles.modalLabel}>Time:</Text>
-                      <Text style={styles.modalValue}>
-                        {format(new Date(selectedAppointment.date), 'hh:mm a')}
-                      </Text>
-                    </View>
-
-                    <View style={styles.detailContainer}>
-                      <Text style={styles.modalLabel}>Contact:</Text>
-                      <Text style={styles.modalValue}>
-                        {selectedAppointment.contact_name}
-                      </Text>
-                    </View>
-
-                    <View style={styles.detailContainer}>
-                      <Text style={styles.modalLabel}>Phone:</Text>
-                      <Text style={styles.modalValue}>
-                        {selectedAppointment.contact_phone}
-                      </Text>
-                    </View>
-
-                    <View style={styles.descriptionContainer}>
-                      <Text style={styles.modalLabel}>Description:</Text>
-                      <ScrollView style={styles.scrollView}>
-                        <Text style={styles.modalDescription}>
-                          {selectedAppointment.description}
-                        </Text>
-                      </ScrollView>
-                    </View>
-
-                    <TouchableOpacity
-                      onPress={() => setModalVisible(false)}
-                      style={styles.closeButton}>
-                      <Text style={styles.closeButtonText}>Close</Text>
-                    </TouchableOpacity>
-                  </>
-                ) : (
-                  <Text style={styles.loadingText}>Loading...</Text>
-                )}
-              </View>
-            </View>
-          </View>
-        </View>
-      </Modal>
+      <AppointmentDetailModal
+        visible={showDetailModal}
+        onClose={() => setShowDetailModal(false)}
+        appointment={selectedAppointment}
+        onEdit={handleEditAppointment}
+        onDelete={handleDeleteAppointment}
+      />
     </View>
   );
 };
@@ -281,25 +259,50 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
+  statsContainer: {
+    flexDirection: 'row',
+    padding: 16,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
+  statBox: {
+    flex: 1,
+    backgroundColor: '#f8f9fa',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  statBoxMiddle: {
+    marginHorizontal: 12,
+  },
+  statLabel: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 4,
+  },
+  statValue: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#2196F3',
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    padding: 10,
+    padding: 16,
     backgroundColor: '#f5f5f5',
   },
   headerButton: {
-    padding: 6,
+    padding: 8,
     borderRadius: 4,
   },
   headerButtonText: {
     color: '#666',
   },
   todayButton: {
-    backgroundColor: '#3674B5',
+    backgroundColor: '#2196F3',
     paddingHorizontal: 16,
     paddingVertical: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   todayButtonText: {
     color: '#fff',
@@ -326,7 +329,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   dayContainer: {
-    padding: 10,
+    padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
   },
@@ -369,41 +372,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     padding: 8,
   },
-  statsContainer: {
-    flexDirection: 'row',
-    padding: 8,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  statBox: {
-    flex: 1,
-    backgroundColor: '#f8f9fa',
-    padding: 3,
-    borderRadius: 6,
-    alignItems: 'center',
-  },
-  statBoxMiddle: {
-    marginHorizontal: 12,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: '#666',
-    marginBottom: 4,
-  },
-  statValue: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#2196F3',
-  },
-  appointmentsContainer: {
-    borderRadius: 8,
-  },
   weekendDayContainer: {
     backgroundColor: '#f8f9ff',
   },
   weekendAppointmentsContainer: {
-    backgroundColor: '#f8f9ff',
+    backgroundColor: '#fff',
     borderRadius: 12,
     padding: 8,
   },
@@ -412,91 +385,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#e3e3ff',
   },
-  prevWeek: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  afterWeek: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContainer: {
-    width: '85%',
-    backgroundColor: 'white',
-    borderRadius: 15,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 4},
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 5,
-  },
-  modalTitleHead: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    textDecorationLine: 'underline',
-    textAlign: 'center',
-    marginBottom: 10,
-    color: '#333',
-  },
-  modalTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    textAlign: 'left',
-    marginBottom: 14,
-    color: '#333',
-  },
-  detailContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 5,
-  },
-  modalLabel: {
-    marginBottom: 10,
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#666',
-  },
-  modalValue: {
-    fontSize: 16,
-    color: '#444',
-  },
-  descriptionContainer: {
-    marginVertical: 10,
-    padding: 10,
-    backgroundColor: '#f8f8f8',
-    borderRadius: 10,
-  },
-  scrollView: {
-    maxHeight: 120,
-  },
-  modalDescription: {
-    fontSize: 15,
-    color: '#555',
-  },
-  closeButton: {
-    marginTop: 15,
-    backgroundColor: '#007AFF',
-    paddingVertical: 12,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  closeButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  loadingText: {
-    textAlign: 'center',
-    fontSize: 16,
-    color: '#666',
+  appointmentsContainer: {
+    borderRadius: 8,
   },
 });
 

@@ -21,9 +21,16 @@ import {
 } from '../service/database';
 import DateTimePickerModal from '../components/DateTimePickerModal';
 import CustomRadioButton from '../components/CustomRadioButton';
+import CompletionToggle from '../components/CompletionToggle';
 import Toast from 'react-native-toast-message';
 import moment from 'moment-timezone';
 import {userTimeZone} from '../../App';
+import {
+  validateTitle,
+  validateDate,
+  validateDescription,
+  getValidationErrorMessage,
+} from '../utils/validation';
 
 const AddAppointmentScreen = ({navigation, route}) => {
   const editingAppointment = route.params?.appointment;
@@ -54,6 +61,12 @@ const AddAppointmentScreen = ({navigation, route}) => {
     editingAppointment?.payment_status_description || '',
   );
 
+  // COMPLETION STATUS
+  const [completed, setCompleted] = useState(
+    editingAppointment?.completed || false,
+  );
+
+  const [errors, setErrors] = useState({});
   const [isChanged, setIsChanged] = useState(false);
   const isChangedRef = useRef(isChanged);
 
@@ -98,7 +111,7 @@ const AddAppointmentScreen = ({navigation, route}) => {
     if (selectedContact !== editingAppointment?.contact_id) {
       setIsChanged(true);
     }
-  }, [selectedContact]);
+  }, [selectedContact, editingAppointment?.contact_id]);
 
   useEffect(() => {
     if (shouldClearForm) {
@@ -182,14 +195,43 @@ const AddAppointmentScreen = ({navigation, route}) => {
 
   // ---------------- HANDLE SAVE -------------------
 
-  const handleSave = async () => {
-    if (!title.trim()) {
-      Alert.alert('Warning', 'Please enter the appointment title');
-      return;
+  const validateForm = () => {
+    const newErrors = {};
+
+    // Validate title
+    const titleError = getValidationErrorMessage('title', title);
+    if (titleError) {
+      newErrors.title = titleError;
     }
 
+    // Validate contact selection
     if (!selectedContact) {
-      Alert.alert('Warning', 'Please select a contact');
+      newErrors.contact = 'Please select a contact';
+    }
+
+    // Validate date
+    const dateError = getValidationErrorMessage('date', date);
+    if (dateError) {
+      newErrors.date = dateError;
+    }
+
+    // Validate description if provided
+    if (description.trim()) {
+      const descriptionError = getValidationErrorMessage(
+        'description',
+        description,
+      );
+      if (descriptionError) {
+        newErrors.description = descriptionError;
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSave = async () => {
+    if (!validateForm()) {
       return;
     }
 
@@ -201,8 +243,9 @@ const AddAppointmentScreen = ({navigation, route}) => {
           title,
           description,
           date.toISOString(),
-          paymentStatus, // Mevcut ödeme durumu
-          paymentDescription, // Mevcut açıklama
+          paymentStatus,
+          paymentDescription,
+          completed,
         );
       } else {
         await addAppointment(
@@ -210,8 +253,9 @@ const AddAppointmentScreen = ({navigation, route}) => {
           title,
           description,
           date.toISOString(),
-          paymentStatus, // Varsayılan değer
-          paymentDescription, // Varsayılan değer
+          paymentStatus,
+          paymentDescription,
+          completed,
         );
       }
       Toast.show({
@@ -350,7 +394,10 @@ const AddAppointmentScreen = ({navigation, route}) => {
                 </View>
               ) : (
                 <TouchableOpacity
-                  style={styles.selectContactButton}
+                  style={[
+                    styles.selectContactButton,
+                    errors.contact && styles.inputError,
+                  ]}
                   onPress={() => setShowContactModal(true)}>
                   <Text style={styles.selectContactButtonText}>
                     Select Contact
@@ -358,30 +405,45 @@ const AddAppointmentScreen = ({navigation, route}) => {
                 </TouchableOpacity>
               )}
             </View>
+            {errors.contact && (
+              <Text style={styles.errorText}>{errors.contact}</Text>
+            )}
 
             <Text style={styles.label}>Title</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, errors.title && styles.inputError]}
               value={title}
               onChangeText={handleInputChange(setTitle)}
               placeholder="Appointment title"
             />
+            {errors.title && (
+              <Text style={styles.errorText}>{errors.title}</Text>
+            )}
+
             <Text style={styles.label}>Description</Text>
             <TextInput
-              style={[styles.input, styles.textArea]}
+              style={[
+                styles.input,
+                styles.textArea,
+                errors.description && styles.inputError,
+              ]}
               value={description}
               onChangeText={handleInputChange(setDescription)}
               placeholder="Appointment description"
               multiline
               numberOfLines={4}
             />
+            {errors.description && (
+              <Text style={styles.errorText}>{errors.description}</Text>
+            )}
             {/**--------------- DATE AND TIME ------------------- */}
             <Text style={styles.label}>Date</Text>
             <TouchableOpacity
-              style={styles.dateButton}
+              style={[styles.dateButton, errors.date && styles.inputError]}
               onPress={() => setShowDatePickerModal(true)}>
               <Text style={styles.dateButtonText}>{format(date, 'PPP')}</Text>
             </TouchableOpacity>
+            {errors.date && <Text style={styles.errorText}>{errors.date}</Text>}
 
             <Text style={styles.label}>Time</Text>
             <TouchableOpacity
@@ -421,6 +483,14 @@ const AddAppointmentScreen = ({navigation, route}) => {
                 multiline
               />
             </View>
+            <CompletionToggle
+              completed={completed}
+              onChange={value => {
+                setCompleted(value);
+                setIsChanged(true);
+              }}
+            />
+
             <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
               <Text style={styles.saveButtonText}>
                 {editingAppointment ? 'Update' : 'Save'}
@@ -635,6 +705,15 @@ const styles = StyleSheet.create({
     height: 100,
     textAlignVertical: 'top',
   },
+  completionStatusContainer: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 16,
+    backgroundColor: '#f9f9f9',
+    marginVertical: 0,
+  },
+
   changeWarning: {
     position: 'absolute',
     top: 6,
@@ -649,6 +728,16 @@ const styles = StyleSheet.create({
   changeWarningText: {
     fontSize: 16,
     color: 'black',
+  },
+  inputError: {
+    borderColor: '#f44336',
+    borderWidth: 2,
+  },
+  errorText: {
+    color: '#f44336',
+    fontSize: 12,
+    marginTop: 4,
+    marginLeft: 4,
   },
 });
 
