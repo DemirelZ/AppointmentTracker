@@ -115,11 +115,18 @@ const AppointmentsScreen = ({navigation}) => {
     return styles.defaultStatus;
   };
 
+  const isPastAppointment = appointmentDate => {
+    const appointmentDateTime = new Date(appointmentDate);
+    const currentDateTime = new Date();
+    return appointmentDateTime < currentDateTime;
+  };
+
   const renderItem = ({item}) => (
     <View
       style={[
         styles.appointmentItem,
         item.completed === 1 && styles.completedAppointmentItem,
+        isPastAppointment(item.date) && styles.pastAppointmentItem,
       ]}>
       <View style={styles.infoContainer}>
         <View style={styles.appointmentHeader}>
@@ -201,8 +208,12 @@ const AppointmentsScreen = ({navigation}) => {
             navigation.navigate('AddAppointmentScreen', {appointment: item})
           }>
           <Edit2 size={20} color="#fff" />
-          <Text style={styles.editText}> Edit appointment & </Text>
-          <Text style={styles.editText}>payment status</Text>
+          <Text
+            style={styles.editText}
+            numberOfLines={1}
+            adjustsFontSizeToFit={true}>
+            Edit appointment & payment status
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.button, styles.deleteButton]}
@@ -318,12 +329,12 @@ const styles = StyleSheet.create({
   },
 
   appointmentDetails: {
-    marginTop: 15,
+    marginTop: 10,
   },
   dateContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 5,
   },
   appointmentDate: {
     fontSize: 14,
@@ -332,16 +343,16 @@ const styles = StyleSheet.create({
   appointmentDescription: {
     fontSize: 15,
     color: '#444',
-    marginVertical: 8,
+    marginVertical: 5,
   },
   contactName: {
-    marginTop: 10,
+    marginTop: 8,
     fontSize: 16,
     fontWeight: '700',
     color: '#333',
   },
   countdownContainer: {
-    marginTop: 15,
+    marginTop: 10,
     paddingVertical: 8,
     backgroundColor: '#f0f4f7',
     borderRadius: 8,
@@ -357,7 +368,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 8,
     paddingVertical: 6,
-    marginTop: 16,
+    marginTop: 10,
     borderRadius: 4,
   },
   editButton: {
@@ -369,6 +380,9 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 12,
     fontWeight: '500',
+    flex: 1,
+    textAlign: 'center',
+    marginLeft: 4,
   },
   deleteButton: {
     backgroundColor: '#D84040',
@@ -529,6 +543,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#e8f5e8',
     borderColor: '#27ae60',
     opacity: 0.8,
+  },
+  pastAppointmentItem: {
+    borderColor: '#e74c3c',
+    backgroundColor: '#fdf2f2',
   },
 });
 
